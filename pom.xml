@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.ksolorzano</groupId>
-    <artifactId>KinInscription</artifactId>
+    <artifactId>KinScription</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>KinInscription</name>
     <description>KinInscription</description>

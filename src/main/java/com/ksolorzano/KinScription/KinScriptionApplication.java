@@ -1,13 +1,13 @@
-package com.ksolorzano.kininscription;
+package com.ksolorzano.KinScription;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class KinInscriptionApplication {
+public class KinScriptionApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(KinInscriptionApplication.class, args);
+        SpringApplication.run(KinScriptionApplication.class, args);
     }
 
 }
