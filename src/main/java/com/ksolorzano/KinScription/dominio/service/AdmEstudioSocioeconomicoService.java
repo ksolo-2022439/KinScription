@@ -68,24 +68,29 @@ public class AdmEstudioSocioeconomicoService {
 
     /**
      * Procesa la aprobación del estudio por parte del Director Administrativo.
-     * Valida que el participante esté en el estado correcto y actualiza su estado a ADMITIDO_SOCIOECONOMICO.
-     * @param estudioId El ID del estudio socioeconómico a aprobar.
-     * @throws IllegalStateException Si el participante no se encuentra en el estado ADMITIDO_EXAMEN.
+     * Guarda los montos de pago asignados y actualiza el estado del participante.
+     * @param estudioId El ID del estudio socioeconómico.
+     * @param montoInscripcion El monto de inscripción asignado por el director.
+     * @param montoMensualidad El monto de mensualidad asignado por el director.
+     * @throws IllegalStateException Si el participante no está en el estado correcto.
      */
     @Transactional
-    public void aprobarPorDirector(int estudioId) {
-        AdmEstudioSocioeconomico estudio = estudioSocioeconomicoRepository.findById(estudioId)
+    public void aprobarPorDirector(int estudioId, BigDecimal montoInscripcion, BigDecimal montoMensualidad) {
+        AdmEstudioSocioeconomico estudio = getById(estudioId)
                 .orElseThrow(() -> new RuntimeException("Estudio no encontrado con ID: " + estudioId));
 
         AdmParticipante participante = estudio.getParticipante();
-        if (participante.getEstado() != EstadoParticipante.ADMITIDO_EXAMEN) {
+        if (participante.getEstado() != EstadoParticipante.SOCIOECONOMICO_ENVIADO) {
             throw new IllegalStateException("El participante no está en el estado correcto para esta acción.");
         }
 
-        estudio.setAprobadoDirector(true);
-        participante.setEstado(EstadoParticipante.ADMITIDO_SOCIOECONOMICO);
+        estudio.setMontoInscripcion(montoInscripcion);
+        estudio.setMontoMensualidad(montoMensualidad);
 
-        estudioSocioeconomicoRepository.save(estudio);
+        estudio.setAprobadoDirector(true);
+        save(estudio);
+
+        participante.setEstado(EstadoParticipante.ADMITIDO_SOCIOECONOMICO);
         participanteService.save(participante);
     }
 

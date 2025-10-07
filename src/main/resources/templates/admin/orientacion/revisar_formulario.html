@@ -1,10 +1,60 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/admin_layout}">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <title>Revisar Formulario</title>
 </head>
 <body>
-$END$
+<main layout:fragment="content">
+    <a th:href="@{/admin/orientacion/formulario/revisar}" class="back-link">&larr; Volver a la Lista</a>
+    <header class="admin-header">
+        <h1>Revisión Final de Formulario</h1>
+        <p>Participante: <strong th:text="${participante.nombreCompleto} + ' ' + ${participante.apellidos}"></strong></p>
+    </header>
+
+    <div class="review-grid">
+        <div class="admin-card info-card">
+            <h3>Datos y Cuotas Asignadas</h3>
+            <div class="info-group">
+                <label>Nombre del Tutor:</label>
+                <span th:text="${estudio.datosTutorNombre}"></span>
+            </div>
+            <!-- ... otros campos del estudio ... -->
+
+            <hr>
+
+            <h4>Cuotas Asignadas por Dirección:</h4>
+            <div class="info-group">
+                <label>Monto de Inscripción:</label>
+                <span th:text="'Q' + ${#numbers.formatDecimal(estudio.montoInscripcion, 1, 'COMMA', 2, 'POINT')}"></span>
+            </div>
+            <div class="info-group">
+                <label>Monto de Mensualidad:</label>
+                <span th:text="'Q' + ${#numbers.formatDecimal(estudio.montoMensualidad, 1, 'COMMA', 2, 'POINT')}"></span>
+            </div>
+        </div>
+
+        <div class="admin-card action-card">
+            <h3>Acciones Finales</h3>
+            <p class="nota-info">
+                Al aprobar, el participante podrá continuar con la entrega de papelería.
+                Se creará el registro del tutor y se generará el reporte de pagos para contabilidad.
+            </p>
+
+            <form th:action="@{/admin/orientacion/formulario/aprobar}" method="post" style="margin-top: 1rem;">
+                <input type="hidden" name="estudioId" th:value="${estudio.id}" />
+                <button type="submit" class="btn-primary">Aprobar Formulario</button>
+            </form>
+
+            <hr>
+
+            <h3>Rechazar Participante</h3>
+            <form th:action="@{/admin/orientacion/participante/rechazar}" method="post">
+                <input type="hidden" name="participanteId" th:value="${participante.id}" />
+                <button type="submit" class="btn-danger">Rechazar Proceso de Admisión</button>
+            </form>
+        </div>
+    </div>
+</main>
 </body>
 </html>

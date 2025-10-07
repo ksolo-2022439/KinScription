@@ -1,16 +1,15 @@
 package com.ksolorzano.KinScription.web.controller;
 
+import com.ksolorzano.KinScription.dominio.repository.AdmDocumentoRequeridoRepository;
 import com.ksolorzano.KinScription.dominio.service.AdmContratoService;
 import com.ksolorzano.KinScription.dominio.service.AdmDocumentoRequeridoService;
 import com.ksolorzano.KinScription.dominio.service.AdmParticipanteService;
+import com.ksolorzano.KinScription.persistence.entity.AdmDocumentoRequerido;
 import com.ksolorzano.KinScription.persistence.entity.AdmParticipante;
 import com.ksolorzano.KinScription.persistence.entity.EstadoParticipante;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -21,11 +20,13 @@ public class SecretariaController {
     private final AdmParticipanteService participanteService;
     private final AdmDocumentoRequeridoService documentoService;
     private final AdmContratoService contratoService;
+    private final AdmDocumentoRequeridoRepository documentoRepository;
 
-    public SecretariaController(AdmParticipanteService participanteService, AdmDocumentoRequeridoService documentoService, AdmContratoService contratoService) {
+    public SecretariaController(AdmParticipanteService participanteService, AdmDocumentoRequeridoService documentoService, AdmContratoService contratoService, AdmDocumentoRequeridoRepository dr) {
         this.participanteService = participanteService;
         this.documentoService = documentoService;
         this.contratoService = contratoService;
+        this.documentoRepository = dr;
     }
 
     /**
@@ -36,6 +37,23 @@ public class SecretariaController {
         List<AdmParticipante> participantes = participanteService.getByEstado(EstadoParticipante.PAPELERIA_ENVIADA);
         model.addAttribute("participantes", participantes);
         return "admin/secretaria/lista_papeleria";
+    }
+
+    /**
+     * Muestra la página de detalle para revisar todos los documentos de un participante.
+     * @param id El ID del PARTICIPANTE.
+     */
+    @GetMapping("/papeleria/revisar/{id}")
+    public String revisarPapeleria(@PathVariable("id") int id, Model model) {
+        AdmParticipante participante = participanteService.getById(id)
+                .orElseThrow(() -> new RuntimeException("Participante no encontrado"));
+
+        List<AdmDocumentoRequerido> documentos = documentoRepository.findByParticipante(participante);
+
+        model.addAttribute("participante", participante);
+        model.addAttribute("documentos", documentos);
+
+        return "admin/secretaria/revisar_papeleria";
     }
 
     /**

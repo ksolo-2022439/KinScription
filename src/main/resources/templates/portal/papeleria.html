@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Entrega de Papelería</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <header class="main-header">
+        <h1>Entrega de Papelería</h1>
+        <p>Sube los documentos solicitados para completar tu expediente.</p>
+    </header>
+
+    <div th:if="${successMessage}" class="flash-success" th:text="${successMessage}"></div>
+
+    <div class="review-grid">
+        <div class="admin-card">
+            <h3>Documentos Requeridos</h3>
+            <ul class="document-list">
+                <li th:each="doc : ${documentosRequeridos}">
+                    <span th:text="${doc}"></span>
+                    <span th:if="${documentosSubidos.containsKey(doc)}" class="badge success">Subido</span>
+                    <span th:unless="${documentosSubidos.containsKey(doc)}" class="badge pending">Pendiente</span>
+                </li>
+            </ul>
+        </div>
+
+        <div class="admin-card">
+            <h3>Subir un Documento</h3>
+            <form th:action="@{/portal/papeleria/subir}" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="documentoNombre">1. Selecciona el tipo de documento:</label>
+                    <select id="documentoNombre" name="documentoNombre" class="form-control" required>
+                        <option value="">-- Elige un documento --</option>
+                        <th:block th:each="doc : ${documentosRequeridos}">
+                            <option th:if="${!documentosSubidos.containsKey(doc)}" th:value="${doc}" th:text="${doc}"></option>
+                        </th:block>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="file">2. Elige el archivo (PDF, JPG, PNG):</label>
+                    <input type="file" id="file" name="file" class="form-control" required>
+                </div>
+
+                <button type="submit" class="btn-primary">Subir Documento</button>
+            </form>
+
+            <hr>
+
+            <h3>Finalizar Proceso</h3>
+            <p class="nota-info">
+                Una vez hayas subido TODOS los documentos requeridos, presiona este botón para enviar tu papelería a revisión.
+            </p>
+            <form th:if="${documentosSubidos.size() == documentosRequeridos.size()}"
+                  th:action="@{/portal/papeleria/finalizar}" method="post" style="margin-top: 1rem;">
+                <button type="submit" class="btn-primary">Finalizar y Enviar a Revisión</button>
+            </form>
+        </div>
+    </div>
+</main>
+</body>
+</html>

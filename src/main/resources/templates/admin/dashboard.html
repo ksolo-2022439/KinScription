@@ -1,12 +1,11 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{admin/admin_layout}">
 <head>
-    <meta charset="UTF-8">
     <title>Dashboard de Administración</title>
-    <link rel="stylesheet" th:href="@{/style/admin_style.css}">
 </head>
 <body>
-<div class="admin-container">
+<main layout:fragment="content">
     <header class="admin-header">
         <h1>Panel de Administración de KinScription</h1>
         <p>Seleccione una tarea para continuar.</p>
@@ -58,6 +57,6 @@
             </a>
         </div>
     </div>
-</div>
+</main>
 </body>
 </html>

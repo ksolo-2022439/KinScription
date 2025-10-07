@@ -1,10 +1,64 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/admin_layout}">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <title>Revisar Estudio</title>
 </head>
 <body>
-$END$
+<main layout:fragment="content">
+    <a th:href="@{/admin/director/socioeconomico/revisar}" class="back-link">&larr; Volver a la Lista</a>
+    <header class="admin-header">
+        <h1>Revisión de Estudio Socioeconómico</h1>
+        <p>Participante: <strong th:text="${participante.nombreCompleto} + ' ' + ${participante.apellidos}"></strong></p>
+    </header>
+
+    <div class="review-grid">
+        <div class="admin-card info-card">
+            <h3>Datos Enviados</h3>
+            <div class="info-group">
+                <label>Nombre del Tutor:</label>
+                <span th:text="${estudio.datosTutorNombre}"></span>
+            </div>
+            <div class="info-group">
+                <label>Apellido del Tutor:</label>
+                <span th:text="${estudio.datosTutorApellido}"></span>
+            </div>
+            <div class="info-group">
+                <label>Teléfono del Tutor:</label>
+                <span th:text="${estudio.datosTutorTelefono}"></span>
+            </div>
+            <div class="info-group">
+                <label>Dirección del Tutor:</label>
+                <span th:text="${estudio.datosTutorDireccion}"></span>
+            </div>
+        </div>
+
+        <div class="admin-card action-card">
+            <h3>Asignar Cuotas y Aprobar</h3>
+            <form th:action="@{/admin/director/socioeconomico/aprobar}" method="post">
+                <input type="hidden" name="estudioId" th:value="${estudio.id}" />
+
+                <div class="form-group">
+                    <label for="montoInscripcion">Monto de Inscripción (Q):</label>
+                    <input type="number" id="montoInscripcion" name="montoInscripcion" class="form-control" required min="0" step="0.01" placeholder="Ej: 500.00">
+                </div>
+                <div class="form-group">
+                    <label for="montoMensualidad">Monto de Mensualidad (Q):</label>
+                    <input type="number" id="montoMensualidad" name="montoMensualidad" class="form-control" required min="0" step="0.01" placeholder="Ej: 850.00">
+                </div>
+
+                <button type="submit" class="btn-primary">Aprobar y Asignar Cuotas</button>
+            </form>
+
+            <hr>
+
+            <h3>Rechazar Participante</h3>
+            <form th:action="@{/admin/director/participante/rechazar}" method="post">
+                <input type="hidden" name="participanteId" th:value="${participante.id}" />
+                <button type="submit" class="btn-danger">Rechazar Proceso de Admisión</button>
+            </form>
+        </div>
+    </div>
+</main>
 </body>
 </html>

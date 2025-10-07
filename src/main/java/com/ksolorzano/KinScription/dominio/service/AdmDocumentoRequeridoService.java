@@ -41,7 +41,7 @@ public class AdmDocumentoRequeridoService {
         AdmParticipante participante = participanteService.getById(participanteId)
                 .orElseThrow(() -> new RuntimeException("Participante no encontrado"));
 
-        if (participante.getEstado() != EstadoParticipante.ADMITIDO_FORMULARIO) {
+        if (participante.getEstado() != EstadoParticipante.PAPELERIA_ENVIADA) {
             throw new IllegalStateException("El participante no ha completado el paso de formulario socioeconómico.");
         }
 

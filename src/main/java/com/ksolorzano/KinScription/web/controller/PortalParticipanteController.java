@@ -1,8 +1,12 @@
 package com.ksolorzano.KinScription.web.controller;
 
+import com.ksolorzano.KinScription.dominio.repository.AdmDocumentoRequeridoRepository;
 import com.ksolorzano.KinScription.dominio.repository.AlumnoRepository;
+import com.ksolorzano.KinScription.dominio.service.AdmContratoService;
 import com.ksolorzano.KinScription.dominio.service.AdmEstudioSocioeconomicoService;
 import com.ksolorzano.KinScription.dominio.service.AdmParticipanteService;
+import com.ksolorzano.KinScription.dominio.service.FileSystemStorageService;
+import com.ksolorzano.KinScription.persistence.entity.AdmDocumentoRequerido;
 import com.ksolorzano.KinScription.persistence.entity.AdmEstudioSocioeconomico;
 import com.ksolorzano.KinScription.persistence.entity.AdmParticipante;
 import com.ksolorzano.KinScription.persistence.entity.EstadoParticipante;
@@ -13,11 +17,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/portal")
@@ -26,12 +32,18 @@ public class PortalParticipanteController {
     private final AdmParticipanteService participanteService;
     private final AlumnoRepository alumnoRepository;
     private final AdmEstudioSocioeconomicoService estudioSocioeconomicoService;
+    private final FileSystemStorageService storageService;
+    private final AdmDocumentoRequeridoRepository documentoRepository;
+    private final AdmContratoService contratoService;
 
     @Autowired
-    public PortalParticipanteController(AdmParticipanteService ps, AlumnoRepository ar, AdmEstudioSocioeconomicoService es) {
+    public PortalParticipanteController(AdmParticipanteService ps, AlumnoRepository ar, AdmEstudioSocioeconomicoService es, FileSystemStorageService ss, AdmDocumentoRequeridoRepository dr, AdmContratoService cs) {
         this.participanteService = ps;
         this.alumnoRepository = ar;
         this.estudioSocioeconomicoService = es;
+        this.storageService = ss;
+        this.documentoRepository = dr;
+        this.contratoService = cs;
     }
 
     @GetMapping("/dashboard")
@@ -133,6 +145,54 @@ public class PortalParticipanteController {
 
         return "redirect:/portal/dashboard";
     }
+    @GetMapping("/papeleria")
+    public String mostrarFormularioPapeleria(Model model, Authentication authentication) {
+        AdmParticipante participante = participanteService.getByUsername(authentication.getName()).orElseThrow();
+
+        List<String> documentosRequeridos = List.of("Fe de Edad", "Acta de Nacimiento", "Certificado 3ro Básico");
+
+        // Documentos que el usuario ya ha subido
+        List<AdmDocumentoRequerido> documentosSubidos = documentoRepository.findByParticipante(participante);
+        Map<String, String> mapaSubidos = documentosSubidos.stream()
+                .collect(Collectors.toMap(AdmDocumentoRequerido::getNombreDocumento, AdmDocumentoRequerido::getUrlArchivo));
+
+        model.addAttribute("participante", participante);
+        model.addAttribute("documentosRequeridos", documentosRequeridos);
+        model.addAttribute("documentosSubidos", mapaSubidos);
+
+        return "portal/papeleria";
+    }
+
+    @PostMapping("/papeleria/subir")
+    public String subirDocumento(@RequestParam("file") MultipartFile file,
+                                 @RequestParam("documentoNombre") String documentoNombre,
+                                 Authentication authentication,
+                                 RedirectAttributes redirectAttributes) {
+
+        AdmParticipante participante = participanteService.getByUsername(authentication.getName()).orElseThrow();
+        String filename = storageService.store(file);
+
+        AdmDocumentoRequerido doc = new AdmDocumentoRequerido();
+        doc.setParticipante(participante);
+        doc.setNombreDocumento(documentoNombre);
+        doc.setUrlArchivo(filename);
+        doc.setEstadoRevision("PENDIENTE");
+        documentoRepository.save(doc);
+
+        redirectAttributes.addFlashAttribute("successMessage", "Documento '" + documentoNombre + "' subido correctamente.");
+        return "redirect:/portal/papeleria";
+    }
+
+    @PostMapping("/papeleria/finalizar")
+    public String finalizarPapeleria(Authentication authentication, RedirectAttributes redirectAttributes) {
+        AdmParticipante participante = participanteService.getByUsername(authentication.getName()).orElseThrow();
+        if (participante.getEstado() == EstadoParticipante.ADMITIDO_FORMULARIO) {
+            participante.setEstado(EstadoParticipante.PAPELERIA_ENVIADA);
+            participanteService.save(participante);
+            redirectAttributes.addFlashAttribute("successMessage", "Toda tu papelería ha sido enviada para revisión.");
+        }
+        return "redirect:/portal/dashboard";
+    }
 
     private int calculateProgress(EstadoParticipante estado) {
         return switch (estado) {
@@ -140,11 +200,10 @@ public class PortalParticipanteController {
             case EXAMEN_REALIZADO -> 10;
             case ADMITIDO_EXAMEN -> 30;
             case SOCIOECONOMICO_ENVIADO -> 30;
-            case ADMITIDO_SOCIOECONOMICO, ADMITIDO_FORMULARIO -> 40;
-            case PAPELERIA_ENVIADA -> 45;
-            case ADMITIDO_PAPELERIA -> 50;
-            case CONTRATO_ENVIADO -> 62;
-            case ADMITIDO_CONTRATO -> 70;
+            case ADMITIDO_SOCIOECONOMICO -> 40;
+            case ADMITIDO_FORMULARIO, PAPELERIA_ENVIADA -> 50;
+            case ADMITIDO_PAPELERIA, CONTRATO_ENVIADO -> 70;
+            case ADMITIDO_CONTRATO -> 90;
             case FINALIZADO -> 100;
             default -> 0;
         };
