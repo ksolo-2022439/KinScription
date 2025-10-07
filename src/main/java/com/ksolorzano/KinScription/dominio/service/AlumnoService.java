@@ -1,7 +1,6 @@
 package com.ksolorzano.KinScription.dominio.service;
 
 import com.ksolorzano.KinScription.dominio.repository.AlumnoRepository;
-import com.ksolorzano.KinScription.dominio.repository.specification.AlumnoSpecification;
 import com.ksolorzano.KinScription.persistence.entity.Alumno;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -63,10 +62,5 @@ public class AlumnoService {
 
     public long countTotal() {
         return alumnoRepository.count();
-    }
-
-    public List<Alumno> buscarAlumnos(String carnet, String nombre, String email, Long gradoId, Long seccionId, Long carreraId) {
-        Specification<Alumno> spec = AlumnoSpecification.getSpec(carnet, nombre, email, gradoId, seccionId, carreraId);
-        return alumnoRepository.findAll(spec, Sort.unsorted());
     }
 }
