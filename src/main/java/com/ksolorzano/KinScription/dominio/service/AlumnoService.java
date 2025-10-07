@@ -38,11 +38,11 @@ public class AlumnoService {
             alumno.setNombreCompleto(newData.getNombreCompleto());
             alumno.setApellidoCompleto(newData.getApellidoCompleto());
             alumno.setDireccion(newData.getDireccion());
-            alumno.setIdGrado(newData.getIdGrado());
-            alumno.setIdSeccion(newData.getIdSeccion());
-            alumno.setIdJornada(newData.getIdJornada());
-            alumno.setIdCarrera(newData.getIdCarrera());
-            alumno.setIdTutor(newData.getIdTutor());
+            alumno.setGrado(newData.getGrado());
+            alumno.setSeccion(newData.getSeccion());
+            alumno.setJornada(newData.getJornada());
+            alumno.setCarrera(newData.getCarrera());
+            alumno.setTutor(newData.getTutor());
             if (newData.getContrasena() != null && !newData.getContrasena().trim().isEmpty()) {
                 alumno.setContrasena(newData.getContrasena());
             }

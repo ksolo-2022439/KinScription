@@ -30,7 +30,7 @@ public class AdminInscripcionController {
      */
     @GetMapping("/examenes")
     public String listarExamenesPendientes(Model model) {
-        List<AdmParticipante> participantes = participanteService.getByEstado(EstadoParticipante.PENDIENTE_EXAMEN);
+        List<AdmParticipante> participantes = participanteService.getByEstado(EstadoParticipante.EXAMEN_REALIZADO);
         model.addAttribute("participantes", participantes);
         return "admin/inscripcion/lista_examenes";
     }

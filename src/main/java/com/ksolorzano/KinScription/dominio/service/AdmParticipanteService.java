@@ -168,13 +168,15 @@ public class AdmParticipanteService {
         nuevoAlumno.setApellidoCompleto(participante.getApellidos());
         nuevoAlumno.setContrasena(contrasenaDefault);
         nuevoAlumno.setDireccion(participante.getDireccion());
-        nuevoAlumno.setIdGrado(participante.getGradoAplica().getIdGrado());
-        nuevoAlumno.setIdCarrera(participante.getCarreraAplica() != null ? participante.getCarreraAplica().getIdCarrera() : null);
-        nuevoAlumno.setIdTutor(participante.getTutor().getIdTutor());
+        nuevoAlumno.setGrado(participante.getGradoAplica());
+        nuevoAlumno.setCarrera(participante.getCarreraAplica());
+        nuevoAlumno.setTutor(participante.getTutor());
 
+        nuevoAlumno.setAdmParticipante(participante);
         Alumno alumnoCreado = alumnoService.save(nuevoAlumno);
         participante.setEstado(EstadoParticipante.FINALIZADO);
         save(participante);
+
         return alumnoCreado;
     }
 

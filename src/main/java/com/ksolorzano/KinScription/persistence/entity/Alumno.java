@@ -10,59 +10,49 @@ public class Alumno {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idAlumno")
+    @Column(name = "id_alumno")
     private Long idAlumno;
 
-    @Column(name = "carnetAlumno", nullable = false, unique = true, length = 20)
+    @Column(name = "carnet_alumno", nullable = false, unique = true, length = 20)
     private String carnetAlumno;
 
-    @Column(name = "nombreCompleto", nullable = false, length = 100)
+    @Column(name = "nombre_completo", nullable = false, length = 100)
     private String nombreCompleto;
 
-    @Column(name = "apellidoCompleto", nullable = false, length = 100)
+    @Column(name = "apellido_completo", nullable = false, length = 100)
     private String apellidoCompleto;
 
-    @Column(name = "emailAcademico", nullable = false)
+    @Column(name = "email_academico", nullable = false, unique = true)
     private String emailAcademico;
 
-    @Column(nullable = false)
+    @Column(name = "contrasena", nullable = false)
     private String contrasena;
 
-    @Column(nullable = false)
+    @Column(name = "direccion", nullable = false)
     private String direccion;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "idGrado", insertable = false, updatable = false)
+    @JoinColumn(name = "id_grado")
     private Grado grado;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "idSeccion", insertable = false, updatable = false)
+    @JoinColumn(name = "id_seccion")
     private Seccion seccion;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "idJornada", insertable = false, updatable = false)
+    @JoinColumn(name = "id_jornada")
     private Jornada jornada;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "idCarrera", insertable = false, updatable = false)
+    @JoinColumn(name = "id_carrera")
     private Carrera carrera;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "idTutor", insertable = false, updatable = false)
+    @JoinColumn(name = "id_tutor")
     private Tutor tutor;
 
-    @Column(name = "idGrado")
-    private Long idGrado;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_participante_origen")
+    private AdmParticipante admParticipante;
 
-    @Column(name = "idSeccion")
-    private Long idSeccion;
-
-    @Column(name = "idJornada")
-    private Long idJornada;
-
-    @Column(name = "idCarrera")
-    private Long idCarrera;
-
-    @Column(name = "idTutor")
-    private Long idTutor;
 }

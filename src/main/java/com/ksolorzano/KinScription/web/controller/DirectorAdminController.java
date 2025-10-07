@@ -30,7 +30,7 @@ public class DirectorAdminController {
      */
     @GetMapping("/socioeconomico/revisar")
     public String listarSocioeconomicos(Model model) {
-        List<AdmParticipante> participantes = participanteService.getByEstado(EstadoParticipante.ADMITIDO_EXAMEN);
+        List<AdmParticipante> participantes = participanteService.getByEstado(EstadoParticipante.SOCIOECONOMICO_ENVIADO);
         model.addAttribute("participantes", participantes);
         return "admin/director/lista_socioeconomico";
     }

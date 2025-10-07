@@ -21,6 +21,14 @@ public interface AlumnoRepository extends JpaRepository<Alumno, Integer> {
     @Query("SELECT MAX(a.carnetAlumno) FROM Alumno a WHERE a.carnetAlumno LIKE :prefijoAno%")
     String findTopByCarnetAlumnoStartingWithOrderByCarnetAlumnoDesc(@Param("prefijoAno") String prefijoAno);
 
+    /**
+     * Busca un Alumno basándose en el ID de su registro de participante de origen.
+     * El nombre sigue la convención de Spring: findBy[CampoEnLaEntidad]_[CampoEnLaEntidadAnidada]
+     * @param participanteId El ID del AdmParticipante.
+     * @return Un Optional que contiene al Alumno si se encuentra.
+     */
+    Optional<Alumno> findByAdmParticipante_Id(Integer participanteId);
+
     boolean existsByCarnetAlumno(String carnet);
     boolean existsByEmailAcademico(String email);
 

@@ -1,28 +1,37 @@
 package com.ksolorzano.KinScription.web.controller;
 
-import com.ksolorzano.KinScription.dominio.repository.AlumnoRepository; // << AÑADIR
+import com.ksolorzano.KinScription.dominio.repository.AlumnoRepository;
+import com.ksolorzano.KinScription.dominio.service.AdmEstudioSocioeconomicoService;
 import com.ksolorzano.KinScription.dominio.service.AdmParticipanteService;
+import com.ksolorzano.KinScription.persistence.entity.AdmEstudioSocioeconomico;
 import com.ksolorzano.KinScription.persistence.entity.AdmParticipante;
-import com.ksolorzano.KinScription.persistence.entity.EstadoParticipante; // << AÑADIR
+import com.ksolorzano.KinScription.persistence.entity.EstadoParticipante;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/portal")
 public class PortalParticipanteController {
 
     private final AdmParticipanteService participanteService;
-    private final AlumnoRepository alumnoRepository; // << AÑADIR
+    private final AlumnoRepository alumnoRepository;
+    private final AdmEstudioSocioeconomicoService estudioSocioeconomicoService;
 
     @Autowired
-    public PortalParticipanteController(AdmParticipanteService participanteService, AlumnoRepository alumnoRepository) { // << AÑADIR
-        this.participanteService = participanteService;
-        this.alumnoRepository = alumnoRepository; // << AÑADIR
+    public PortalParticipanteController(AdmParticipanteService ps, AlumnoRepository ar, AdmEstudioSocioeconomicoService es) {
+        this.participanteService = ps;
+        this.alumnoRepository = ar;
+        this.estudioSocioeconomicoService = es;
     }
 
     @GetMapping("/dashboard")
@@ -38,27 +47,96 @@ public class PortalParticipanteController {
         model.addAttribute("participante", participante);
         model.addAttribute("progressPercentage", progressPercentage);
 
-        // ¡NUEVO! Si el estado es FINALIZADO, busca el alumno asociado para mostrar sus credenciales.
         if (participante.getEstado() == EstadoParticipante.FINALIZADO) {
-            // Nota: Esto asume que el carnet del alumno contiene el ID del participante.
-            // Una mejor aproximación sería tener una FK de Alumno a AdmParticipante.
-            // Por ahora, buscaremos por el nombre. ¡Esto es solo para pruebas!
-            // La lógica real buscaría por un ID de participante en la tabla alumno.
-            String carnet = "2025001"; // Carnet hardcodeado del Seeder
-            alumnoRepository.findByCarnetAlumno(carnet) // Necesitarás añadir este método al repo
+            alumnoRepository.findByAdmParticipante_Id(participante.getId())
                     .ifPresent(alumno -> model.addAttribute("alumno", alumno));
         }
 
         return "portal/dashboard";
     }
 
+    /**
+     * Muestra la página de simulación del examen de admisión.
+     * @param model El modelo para pasar datos a la vista.
+     * @param authentication Contiene la información del usuario autenticado.
+     * @return El nombre de la vista "portal/examen".
+     */
+    @GetMapping("/examen")
+    public String mostrarPaginaExamen(Model model, Authentication authentication) {
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        AdmParticipante participante = participanteService.getByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("Participante no encontrado"));
+
+        model.addAttribute("participante", participante);
+        return "portal/examen";
+    }
+
+    /**
+     * Procesa la "finalización" del examen de simulación.
+     * En un entorno real, aquí se guardaría el examen. En nuestra simulación,
+     * simplemente redirige al dashboard, donde el participante esperará la calificación.
+     * @param authentication Contiene la información del usuario.
+     * @return Una redirección al dashboard del portal.
+     */
+    @PostMapping("/examen/completar")
+    public String completarExamen(Authentication authentication, RedirectAttributes redirectAttributes) {
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        AdmParticipante participante = participanteService.getByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("Participante no encontrado"));
+
+        if (participante.getEstado() == EstadoParticipante.PENDIENTE_EXAMEN) {
+            participante.setEstado(EstadoParticipante.EXAMEN_REALIZADO);
+            participanteService.save(participante);
+            redirectAttributes.addFlashAttribute("successMessage", "¡Felicidades por completar el examen!");
+        }
+
+        return "redirect:/portal/dashboard";
+    }
+
+    @GetMapping("/socioeconomico")
+    public String mostrarFormularioSocioeconomico(Model model) {
+        model.addAttribute("estudioSocioeconomico", new AdmEstudioSocioeconomico());
+        return "portal/socioeconomico";
+    }
+
+    @PostMapping("/socioeconomico/guardar")
+    public String guardarSocioeconomico(
+            @Valid @ModelAttribute("estudioSocioeconomico") AdmEstudioSocioeconomico estudio,
+            BindingResult bindingResult,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes) {
+
+        if (bindingResult.hasErrors()) {
+            return "portal/socioeconomico"; // Volver al formulario si hay errores
+        }
+
+        AdmParticipante participante = participanteService.getByUsername(authentication.getName()).orElseThrow();
+
+        if (participante.getEstado() == EstadoParticipante.ADMITIDO_EXAMEN) {
+            estudio.setParticipante(participante);
+            estudioSocioeconomicoService.save(estudio); // Guardar el formulario
+
+            participante.setEstado(EstadoParticipante.SOCIOECONOMICO_ENVIADO); // Actualizar estado
+            participanteService.save(participante);
+
+            redirectAttributes.addFlashAttribute("successMessage", "Formulario enviado correctamente. Está en proceso de revisión.");
+        }
+
+        return "redirect:/portal/dashboard";
+    }
+
     private int calculateProgress(EstadoParticipante estado) {
         return switch (estado) {
             case PENDIENTE_EXAMEN -> 0;
-            case ADMITIDO_EXAMEN -> 25;
-            case ADMITIDO_SOCIOECONOMICO, ADMITIDO_FORMULARIO -> 50;
-            case ADMITIDO_PAPELERIA -> 75;
-            case ADMITIDO_CONTRATO, FINALIZADO -> 100;
+            case EXAMEN_REALIZADO -> 5;
+            case ADMITIDO_EXAMEN -> 10;
+            case SOCIOECONOMICO_ENVIADO -> 20;
+            case ADMITIDO_SOCIOECONOMICO, ADMITIDO_FORMULARIO -> 30;
+            case PAPELERIA_ENVIADA -> 40;
+            case ADMITIDO_PAPELERIA -> 50;
+            case CONTRATO_ENVIADO -> 62;
+            case ADMITIDO_CONTRATO -> 70;
+            case FINALIZADO -> 100;
             default -> 0;
         };
     }

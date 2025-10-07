@@ -33,7 +33,7 @@ public class SecretariaController {
      */
     @GetMapping("/papeleria")
     public String listarPendientesPapeleria(Model model) {
-        List<AdmParticipante> participantes = participanteService.getByEstado(EstadoParticipante.ADMITIDO_FORMULARIO);
+        List<AdmParticipante> participantes = participanteService.getByEstado(EstadoParticipante.PAPELERIA_ENVIADA);
         model.addAttribute("participantes", participantes);
         return "admin/secretaria/lista_papeleria";
     }
@@ -52,10 +52,7 @@ public class SecretariaController {
      */
     @GetMapping("/contratos")
     public String listarContratos(Model model) {
-        // Aquí se necesitaría una lógica más elaborada para obtener solo los contratos
-        // de participantes en el estado ADMITIDO_PAPELERIA.
-        // Por ahora, asumimos que se listarán todos los contratos pendientes.
-        List<AdmParticipante> participantes = participanteService.getByEstado(EstadoParticipante.ADMITIDO_PAPELERIA);
+        List<AdmParticipante> participantes = participanteService.getByEstado(EstadoParticipante.CONTRATO_ENVIADO);
         model.addAttribute("participantes", participantes);
         return "admin/secretaria/lista_contratos";
     }

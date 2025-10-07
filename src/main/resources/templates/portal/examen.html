@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Examen de Admisión</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <header class="main-header">
+        <h1>Evaluación de Ingreso</h1>
+        <p>Lee las instrucciones cuidadosamente antes de comenzar.</p>
+    </header>
+
+    <section class="content-cards">
+        <div class="card active">
+            <h3>Instrucciones del Examen</h3>
+            <p>
+                Tendrás un tiempo límite de 2 horas para completar la evaluación una vez que presiones el botón "Iniciar Examen".
+                Asegúrate de tener una conexión a internet estable.
+            </p>
+            <p>
+                <strong>Importante:</strong> Está terminantemente prohibido el uso de ayuda externa para resolver el examen.
+            </p>
+
+            <form th:action="@{/portal/examen/completar}" method="post">
+                <button type="submit" class="btn-primary">Iniciar Examen</button>
+            </form>
+        </div>
+    </section>
+</main>
+</body>
+</html>

@@ -11,6 +11,10 @@
         <p>Sigue los pasos a continuación para completar tu proceso.</p>
     </header>
 
+    <div th:if="${successMessage}" class="flash-success">
+        <p th:text="${successMessage}"></p>
+    </div>
+
     <section class="progress-steps">
         <div class="progress-line-bg"></div>
         <div class="progress-line-fg" th:style="'width: ' + ${progressPercentage} + '%;'"></div>
@@ -66,50 +70,71 @@
                 <span><strong>Fecha:</strong> 25 de Octubre, 2025</span>
                 <span><strong>Hora:</strong> 9:00 AM</span>
             </div>
-            <button class="btn-primary">Iniciar Examen</button>
+            <a th:href="@{/portal/examen}" class="btn-primary">Iniciar Examen</a>
+        </div>
+
+        <div th:case="'EXAMEN_REALIZADO'" class="card waiting">
+            <h3>Examen Entregado</h3>
+            <p>Hemos recibido tu evaluación. Nuestro personal administrativo la calificará pronto. Por favor, mantente atento a las actualizaciones en este portal.</p>
         </div>
 
         <div th:case="'ADMITIDO_EXAMEN'" class="card active">
             <h3>Formulario Socioeconómico</h3>
-            <p>¡Felicidades, aprobaste el examen! Ahora, por favor completa el formulario socioeconómico. Esta
-                información es confidencial y se usará para definir tus cuotas.</p>
-            <button class="btn-primary">Llenar Formulario</button>
+            <p>¡Felicidades, aprobaste el examen! Ahora, por favor completa el formulario socioeconómico. Esta información es confidencial y se usará para definir tus cuotas.</p>
+            <a th:href="@{/portal/socioeconomico}" class="btn-primary">Llenar Formulario</a>
+        </div>
+
+        <div th:case="'SOCIOECONOMICO_ENVIADO'" class="card waiting">
+            <h3>Formulario en Revisión</h3>
+            <p>Hemos recibido tu formulario socioeconómico. Nuestro personal lo está revisando y te notificaremos cuando el proceso continúe.</p>
         </div>
 
         <div th:case="'ADMITIDO_SOCIOECONOMICO'" class="card waiting">
             <h3>Formulario en Revisión</h3>
-            <p>Hemos recibido tu formulario. Está siendo revisado por nuestro personal administrativo y de orientación.
-                Te notificaremos cuando el proceso continúe.</p>
+            <p>Tu formulario ha sido aprobado por Dirección. Ahora está siendo revisado por el área de Orientación. Espera la confirmación final.</p>
         </div>
 
         <div th:case="'ADMITIDO_FORMULARIO'" class="card active">
             <h3>Entrega de Papelería</h3>
             <p>Tu solicitud ha sido aprobada. El siguiente paso es subir los documentos requeridos a la plataforma.</p>
-            <button class="btn-primary">Subir Documentos</button>
+            <a th:href="@{/portal/papeleria}" class="btn-primary">Subir Documentos</a>
+        </div>
+
+        <div th:case="'PAPELERIA_ENVIADA'" class="card waiting">
+            <h3>Papelería en Revisión</h3>
+            <p>Hemos recibido tus documentos. Secretaría los está revisando para asegurar que todo esté en orden.</p>
         </div>
 
         <div th:case="'ADMITIDO_PAPELERIA'" class="card active">
             <h3>Firma de Contrato</h3>
-            <p>Tu expediente está completo. Descarga el contrato, fírmalo con la ayuda de un abogado y súbelo en formato
-                PDF para finalizar.</p>
-            <button class="btn-primary">Gestionar Contrato</button>
+            <p>Tu expediente está completo. Descarga el contrato, fírmalo con la ayuda de un abogado y súbelo en formato PDF para finalizar.</p>
+            <a th:href="@{/portal/contrato}" class="btn-primary">Gestionar Contrato</a>
         </div>
 
-        <div th:case="'ADMITIDO_CONTRATO'" class="card waiting">
-            <h3>Generando Credenciales</h3>
-            <p>¡Casi terminamos! Estamos generando tu cuenta institucional. En breve, verás tus credenciales finales en
-                este portal.</p>
+        <div th:case="'CONTRATO_ENVIADO'" class="card waiting">
+            <h3>Contrato en Revisión</h3>
+            <p>¡Ya casi terminas! Hemos recibido tu contrato y lo estamos revisando para la aprobación final.</p>
         </div>
 
         <div th:case="'FINALIZADO'" class="card completed">
-            <h3>¡Proceso de Inscripción Finalizado!</h3>
-            <p>¡Bienvenido a la comunidad académica! Estas son tus credenciales de acceso al campus principal.</p>
+            <h3>¡Has sido admitido oficialmente!</h3>
+            <p>
+                ¡Felicidades y bienvenido a la comunidad académica de KinScription! Tu proceso de inscripción ha finalizado con éxito.
+                A continuación, encontrarás tus credenciales de acceso para el **Campus Principal**.
+            </p>
+
             <div class="credentials-box">
-                <p><strong>Correo Institucional:</strong> <span th:text="${alumno.emailAcademico}">jperez-2025001@kinal.edu.gt</span>
-                </p>
+                <p><strong>Correo Institucional:</strong> <span th:text="${alumno.emailAcademico}"></span></p>
                 <p><strong>Contraseña Temporal:</strong> <span>password123</span></p>
             </div>
-            <small>Recuerda cambiar tu contraseña en tu primer inicio de sesión.</small>
+            <small><strong>Importante:</strong> Debes cambiar tu contraseña en tu primer inicio de sesión en el Campus Principal por seguridad.</small>
+
+            <div class="final-actions">
+                <form th:action="@{/logout}" method="post" style="margin: 0;">
+                    <button type="submit" class="btn-primary">Cerrar Sesión del Portal</button>
+                </form>
+                <a href="#" class="btn-secondary">Ir al Campus Principal</a>
+            </div>
         </div>
     </section>
 </main>
