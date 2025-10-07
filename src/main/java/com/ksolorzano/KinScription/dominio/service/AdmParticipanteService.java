@@ -10,8 +10,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.text.Normalizer;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 /**
  * Servicio central que gestiona toda la lógica de negocio relacionada con los participantes.
@@ -150,11 +152,14 @@ public class AdmParticipanteService {
             throw new RuntimeException("Error de concurrencia: El carnet " + nuevoCarnet + " ya fue generado.");
         }
 
-        String primeraLetraNombre = participante.getNombreCompleto().substring(0, 1).toLowerCase();
-        String primerApellido = participante.getApellidos().split(" ")[0].toLowerCase();
+        String primeraLetraNombre = participante.getNombreCompleto().substring(0, 1);
+        String primerApellido = participante.getApellidos().split(" ")[0];
+        String letraLimpia = removeAccents(primeraLetraNombre);
+        String apellidoLimpio = removeAccents(primerApellido);
+
         String emailAcademico = String.format("%s%s-%s@kinal.edu.gt",
-                primeraLetraNombre,
-                primerApellido,
+                letraLimpia.toLowerCase(),
+                apellidoLimpio.toLowerCase(),
                 nuevoCarnet);
 
         if (alumnoRepository.existsByEmailAcademico(emailAcademico)) {
@@ -214,5 +219,20 @@ public class AdmParticipanteService {
             save(participante);
             return true;
         }).orElse(false);
+    }
+
+    /**
+     * Método ayudante para eliminar acentos y diacríticos de una cadena de texto.
+     * Convierte "José Ángel" a "Jose Angel".
+     * @param input La cadena de texto de entrada.
+     * @return La cadena de texto normalizada y sin acentos.
+     */
+    private String removeAccents(String input) {
+        if (input == null) {
+            return null;
+        }
+        String normalized = Normalizer.normalize(input, Normalizer.Form.NFD);
+        Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+        return pattern.matcher(normalized).replaceAll("");
     }
 }

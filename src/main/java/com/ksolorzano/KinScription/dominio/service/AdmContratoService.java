@@ -21,7 +21,8 @@ public class AdmContratoService {
 
     /**
      * Constructor para inyección de dependencias.
-     * @param contratoRepository Repositorio para la entidad AdmContrato.
+     *
+     * @param contratoRepository  Repositorio para la entidad AdmContrato.
      * @param participanteService Servicio para la entidad AdmParticipante.
      */
     @Autowired
@@ -32,6 +33,7 @@ public class AdmContratoService {
 
     /**
      * Guarda la información de un contrato en la base de datos.
+     *
      * @param contrato El objeto {@link AdmContrato} a guardar.
      * @return El contrato guardado.
      */
@@ -41,6 +43,7 @@ public class AdmContratoService {
 
     /**
      * Busca un contrato por su ID único.
+     *
      * @param id El ID del contrato.
      * @return Un {@link Optional} que contiene el contrato si se encuentra.
      */
@@ -53,6 +56,7 @@ public class AdmContratoService {
      * La operación realiza dos acciones clave dentro de una misma transacción:
      * 1. Cambia el estado del participante a ADMITIDO_CONTRATO.
      * 2. Llama al servicio de participante para finalizar el proceso y crear la entidad Alumno.
+     *
      * @param contratoId El ID del contrato a aprobar.
      * @throws IllegalStateException Si el participante no ha completado el paso de papelería.
      */
@@ -62,7 +66,7 @@ public class AdmContratoService {
                 .orElseThrow(() -> new RuntimeException("Contrato no encontrado con ID: " + contratoId));
 
         AdmParticipante participante = contrato.getParticipante();
-        if (participante.getEstado() != EstadoParticipante.ADMITIDO_PAPELERIA) {
+        if (participante.getEstado() != EstadoParticipante.CONTRATO_ENVIADO) {
             throw new IllegalStateException("El participante no ha completado el paso de papelería.");
         }
 
@@ -78,7 +82,8 @@ public class AdmContratoService {
 
     /**
      * Actualiza los datos de un contrato existente.
-     * @param id El ID del contrato a modificar.
+     *
+     * @param id      El ID del contrato a modificar.
      * @param newData Un objeto AdmContrato con la nueva información.
      * @return Un {@link Optional} con el contrato actualizado.
      */
@@ -94,6 +99,7 @@ public class AdmContratoService {
 
     /**
      * Elimina un contrato de la base de datos.
+     *
      * @param id El ID del contrato a eliminar.
      * @return {@code true} si se eliminó con éxito, {@code false} si no se encontró.
      */
@@ -103,5 +109,9 @@ public class AdmContratoService {
             contratoRepository.deleteById(id);
             return true;
         }).orElse(false);
+    }
+
+    public Optional<AdmContrato> findByParticipante(AdmParticipante participante) {
+        return contratoRepository.findByParticipante(participante);
     }
 }

@@ -10,6 +10,7 @@ import com.ksolorzano.KinScription.persistence.entity.EstadoParticipante;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -65,9 +66,6 @@ public class SecretariaController {
         return "redirect:/admin/secretaria/papeleria";
     }
 
-    /**
-     * Muestra la lista de contratos subidos que están pendientes de aprobación.
-     */
     @GetMapping("/contratos")
     public String listarContratos(Model model) {
         List<AdmParticipante> participantes = participanteService.getByEstado(EstadoParticipante.CONTRATO_ENVIADO);
@@ -76,16 +74,33 @@ public class SecretariaController {
     }
 
     /**
-     * Procesa la aprobación final del contrato, el último paso del proceso.
+     * Muestra la página de detalle para revisar el contrato de un participante.
+     * @param id El ID del PARTICIPANTE.
      */
+    @GetMapping("/contratos/revisar/{id}")
+    public String revisarContrato(@PathVariable("id") int id, Model model) {
+        AdmParticipante participante = participanteService.getById(id)
+                .orElseThrow(() -> new RuntimeException("Participante no encontrado"));
+
+        contratoService.findByParticipante(participante)
+                .ifPresent(contrato -> model.addAttribute("contrato", contrato));
+
+        model.addAttribute("participante", participante);
+        return "admin/secretaria/revisar_contrato";
+    }
+
     @PostMapping("/contratos/aprobar")
-    public String aprobarContrato(@RequestParam("contratoId") int contratoId) {
-        contratoService.aprobarContrato(contratoId);
-        // ¡PASO CLAVE! Después de aprobar, se debe llamar al servicio
-        // para "graduar" al participante y convertirlo en alumno.
-        // Ej: participanteService.finalizarProcesoAdmision(participanteId);
+    public String aprobarContrato(@RequestParam("contratoId") int contratoId, RedirectAttributes redirectAttributes) {
+        try {
+            contratoService.aprobarContrato(contratoId);
+            redirectAttributes.addFlashAttribute("successMessage", "¡Contrato aprobado! El participante ha sido inscrito y convertido en alumno exitosamente.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Error al aprobar el contrato: " + e.getMessage());
+        }
         return "redirect:/admin/secretaria/contratos";
     }
+
+
 
     @PostMapping("/participante/rechazar")
     public String rechazarParticipante(@RequestParam("participanteId") int participanteId, @RequestParam("origen") String origen) {

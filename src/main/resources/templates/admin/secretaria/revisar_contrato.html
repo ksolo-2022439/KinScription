@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/admin_layout}">
+<head>
+    <title>Revisar Contrato Final</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <a th:href="@{/admin/secretaria/contratos}" class="back-link">&larr; Volver a la Lista</a>
+    <header class="admin-header">
+        <h1>Revisión de Contrato Final</h1>
+        <p>Participante: <strong th:text="${participante.nombreCompleto} + ' ' + ${participante.apellidos}"></strong></p>
+    </header>
+
+    <div class="review-grid">
+        <div class="admin-card">
+            <h3>Datos del Contrato Firmado</h3>
+            <div class="info-group">
+                <label>Nombre del Abogado:</label>
+                <span th:text="${contrato.nombreAbogado}"></span>
+            </div>
+            <div class="info-group">
+                <label>Colegiado del Abogado:</label>
+                <span th:text="${contrato.colegiadoAbogado}"></span>
+            </div>
+
+            <button class="btn-secondary view-pdf-btn" th:data-url="@{/uploads/{filename}(filename=${contrato.urlPdfContrato})}">
+                Ver Contrato Firmado
+            </button>
+
+            <hr>
+
+            <h3>Acción Final de Admisión</h3>
+            <p class="nota-info">
+                Al aprobar, el participante será convertido en Alumno, se generarán sus credenciales y el proceso de admisión se dará por finalizado.
+            </p>
+            <div class="action-buttons">
+                <form th:action="@{/admin/secretaria/contratos/aprobar}" method="post">
+                    <input type="hidden" name="contratoId" th:value="${contrato.id}" />
+                    <button type="submit" class="btn-primary">Aprobar Contrato y Finalizar Proceso</button>
+                </form>
+                <form th:action="@{/admin/secretaria/participante/rechazar}" method="post">
+                    <input type="hidden" name="participanteId" th:value="${participante.id}" />
+                    <input type="hidden" name="origen" value="contratos" />
+                    <button type="submit" class="btn-danger">Rechazar Proceso</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="admin-card pdf-viewer-container">
+            <div id="pdf-placeholder" class="pdf-placeholder">
+                <p>Haz clic en "Ver Contrato Firmado" para visualizarlo aquí.</p>
+            </div>
+            <iframe id="pdf-viewer" class="pdf-viewer" src="" title="Visor de Contrato"></iframe>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const viewButtons = document.querySelectorAll('.view-pdf-btn');
+            const pdfViewer = document.getElementById('pdf-viewer');
+            const pdfPlaceholder = document.getElementById('pdf-placeholder');
+
+            viewButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const pdfUrl = this.getAttribute('data-url');
+                    pdfPlaceholder.style.display = 'none';
+                    pdfViewer.style.display = 'block';
+                    pdfViewer.setAttribute('src', pdfUrl);
+                });
+            });
+        });
+    </script>
+</main>
+</body>
+</html>

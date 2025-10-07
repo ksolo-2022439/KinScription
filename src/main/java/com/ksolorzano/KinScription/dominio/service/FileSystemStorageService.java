@@ -70,4 +70,13 @@ public class FileSystemStorageService {
             throw new RuntimeException("No se pudo leer el archivo: " + filename, e);
         }
     }
+
+    /**
+     * Devuelve la ruta completa de un archivo en el directorio de almacenamiento.
+     * @param filename El nombre del archivo.
+     * @return La ruta (Path) del archivo.
+     */
+    public Path load(String filename) {
+        return rootLocation.resolve(filename);
+    }
 }

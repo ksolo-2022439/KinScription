@@ -1,10 +1,41 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/admin_layout}">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Revisión de Contratos</title>
 </head>
 <body>
+<main layout:fragment="content">
+    <a th:href="@{/admin/dashboard}" class="back-link">&larr; Volver al Dashboard</a>
+    <header class="admin-header">
+        <h1>Contratos Pendientes de Aprobación Final</h1>
+        <p>Participantes que han subido su contrato firmado y esperan la revisión final.</p>
+    </header>
 
+    <div th:if="${successMessage}" class="flash-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="flash-error" th:text="${errorMessage}"></div>
+
+    <div class="admin-card">
+        <div th:if="${participantes.isEmpty()}"><p>No hay contratos pendientes de revisión.</p></div>
+        <table class="data-table" th:if="${!participantes.isEmpty()}">
+            <thead>
+            <tr>
+                <th>ID</th><th>Nombres</th><th>Apellidos</th><th>Grado Aplica</th><th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="p : ${participantes}">
+                <td th:text="${p.id}"></td>
+                <td th:text="${p.nombreCompleto}"></td>
+                <td th:text="${p.apellidos}"></td>
+                <td th:text="${p.gradoAplica.nombreGrado}"></td>
+                <td>
+                    <a th:href="@{/admin/secretaria/contratos/revisar/{id}(id=${p.id})}" class="btn-primary">Revisar</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
 </body>
 </html>

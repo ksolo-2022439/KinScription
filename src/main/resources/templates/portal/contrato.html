@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Gestión de Contrato</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <header class="main-header">
+        <h1>Gestión de Contrato de Inscripción</h1>
+        <p>Este es el último paso. Revisa, descarga y sube tu contrato firmado.</p>
+    </header>
+
+    <div class="review-grid">
+        <div class="admin-card">
+            <h3>Paso 1: Descargar y Firmar Contrato</h3>
+            <p class="nota-info">
+                Visualiza el contrato a continuación. Debes descargarlo, imprimirlo y hacerlo firmar por tu encargado y
+                un abogado colegiado.
+            </p>
+
+            <div class="pdf-viewer-container" style="height: 60vh;">
+                <iframe class="pdf-viewer"
+                        th:src="@{/contracts/contrato-final.pdf}"
+                        style="width: 100%; height: 100%; display: block;"></iframe>
+            </div>
+
+            <a th:href="@{/contracts/contrato-final.pdf}" download="contrato-inscripcion-kinscription.pdf"
+               class="btn-download">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                Descargar Contrato
+            </a>
+        </div>
+
+        <div class="admin-card">
+            <h3>Paso 2: Subir Contrato Firmado</h3>
+            <p>Una vez firmado, completa los datos del abogado y sube el documento escaneado en formato PDF.</p>
+
+            <form th:action="@{/portal/contrato/subir}" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="nombreAbogado">Nombre Completo del Abogado:</label>
+                    <input type="text" id="nombreAbogado" name="nombreAbogado" class="form-control" required
+                           placeholder="Ej: Lic. Juan Pérez">
+                </div>
+                <div class="form-group">
+                    <label for="colegiadoAbogado">Número de Colegiado Activo:</label>
+                    <input type="text" id="colegiadoAbogado" name="colegiadoAbogado" class="form-control" required
+                           placeholder="Ej: 12345">
+                </div>
+                <div class="form-group">
+                    <label for="file">Archivo del Contrato Firmado (PDF):</label>
+                    <input type="file" id="file" name="file" class="form-control" required accept=".pdf">
+                </div>
+                <button type="submit" class="btn-primary">Finalizar y Subir Contrato</button>
+            </form>
+        </div>
+    </div>
+</main>
+</body>
+</html>

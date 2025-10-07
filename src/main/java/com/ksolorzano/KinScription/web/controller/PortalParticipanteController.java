@@ -6,10 +6,7 @@ import com.ksolorzano.KinScription.dominio.service.AdmContratoService;
 import com.ksolorzano.KinScription.dominio.service.AdmEstudioSocioeconomicoService;
 import com.ksolorzano.KinScription.dominio.service.AdmParticipanteService;
 import com.ksolorzano.KinScription.dominio.service.FileSystemStorageService;
-import com.ksolorzano.KinScription.persistence.entity.AdmDocumentoRequerido;
-import com.ksolorzano.KinScription.persistence.entity.AdmEstudioSocioeconomico;
-import com.ksolorzano.KinScription.persistence.entity.AdmParticipante;
-import com.ksolorzano.KinScription.persistence.entity.EstadoParticipante;
+import com.ksolorzano.KinScription.persistence.entity.*;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -69,7 +66,8 @@ public class PortalParticipanteController {
 
     /**
      * Muestra la página de simulación del examen de admisión.
-     * @param model El modelo para pasar datos a la vista.
+     *
+     * @param model          El modelo para pasar datos a la vista.
      * @param authentication Contiene la información del usuario autenticado.
      * @return El nombre de la vista "portal/examen".
      */
@@ -87,6 +85,7 @@ public class PortalParticipanteController {
      * Procesa la "finalización" del examen de simulación.
      * En un entorno real, aquí se guardaría el examen. En nuestra simulación,
      * simplemente redirige al dashboard, donde el participante esperará la calificación.
+     *
      * @param authentication Contiene la información del usuario.
      * @return Una redirección al dashboard del portal.
      */
@@ -145,6 +144,7 @@ public class PortalParticipanteController {
 
         return "redirect:/portal/dashboard";
     }
+
     @GetMapping("/papeleria")
     public String mostrarFormularioPapeleria(Model model, Authentication authentication) {
         AdmParticipante participante = participanteService.getByUsername(authentication.getName()).orElseThrow();
@@ -191,6 +191,43 @@ public class PortalParticipanteController {
             participanteService.save(participante);
             redirectAttributes.addFlashAttribute("successMessage", "Toda tu papelería ha sido enviada para revisión.");
         }
+        return "redirect:/portal/dashboard";
+    }
+
+    @GetMapping("/contrato")
+    public String mostrarFormularioContrato(Model model, Authentication authentication) {
+        AdmParticipante participante = participanteService.getByUsername(authentication.getName()).orElseThrow();
+        model.addAttribute("participante", participante); // Para el layout
+        return "portal/contrato";
+    }
+
+    @PostMapping("/contrato/subir")
+    public String subirContrato(@RequestParam("file") MultipartFile file,
+                                @RequestParam("nombreAbogado") String nombreAbogado,
+                                @RequestParam("colegiadoAbogado") String colegiadoAbogado,
+                                Authentication authentication,
+                                RedirectAttributes redirectAttributes) {
+
+        AdmParticipante participante = participanteService.getByUsername(authentication.getName()).orElseThrow();
+
+        if (participante.getEstado() == EstadoParticipante.ADMITIDO_PAPELERIA) {
+            String filename = storageService.store(file);
+
+            AdmContrato contrato = new AdmContrato();
+            contrato.setParticipante(participante);
+            contrato.setNombreAbogado(nombreAbogado);
+            contrato.setColegiadoAbogado(colegiadoAbogado);
+            contrato.setUrlPdfContrato(filename);
+            contrato.setAprobado(false);
+            contratoService.save(contrato);
+
+            // Actualizar el estado del participante
+            participante.setEstado(EstadoParticipante.CONTRATO_ENVIADO);
+            participanteService.save(participante);
+
+            redirectAttributes.addFlashAttribute("successMessage", "Contrato subido correctamente. Está en proceso de revisión final.");
+        }
+
         return "redirect:/portal/dashboard";
     }
 
