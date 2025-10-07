@@ -94,8 +94,14 @@ public class PortalParticipanteController {
     }
 
     @GetMapping("/socioeconomico")
-    public String mostrarFormularioSocioeconomico(Model model) {
+    public String mostrarFormularioSocioeconomico(Model model, Authentication authentication) {
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        AdmParticipante participante = participanteService.getByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("Participante no encontrado"));
+
+        model.addAttribute("participante", participante);
         model.addAttribute("estudioSocioeconomico", new AdmEstudioSocioeconomico());
+
         return "portal/socioeconomico";
     }
 
@@ -104,19 +110,22 @@ public class PortalParticipanteController {
             @Valid @ModelAttribute("estudioSocioeconomico") AdmEstudioSocioeconomico estudio,
             BindingResult bindingResult,
             Authentication authentication,
-            RedirectAttributes redirectAttributes) {
-
-        if (bindingResult.hasErrors()) {
-            return "portal/socioeconomico"; // Volver al formulario si hay errores
-        }
+            RedirectAttributes redirectAttributes,
+            Model model) {
 
         AdmParticipante participante = participanteService.getByUsername(authentication.getName()).orElseThrow();
 
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("participante", participante);
+
+            return "portal/socioeconomico";
+        }
+
         if (participante.getEstado() == EstadoParticipante.ADMITIDO_EXAMEN) {
             estudio.setParticipante(participante);
-            estudioSocioeconomicoService.save(estudio); // Guardar el formulario
+            estudioSocioeconomicoService.save(estudio);
 
-            participante.setEstado(EstadoParticipante.SOCIOECONOMICO_ENVIADO); // Actualizar estado
+            participante.setEstado(EstadoParticipante.SOCIOECONOMICO_ENVIADO);
             participanteService.save(participante);
 
             redirectAttributes.addFlashAttribute("successMessage", "Formulario enviado correctamente. Está en proceso de revisión.");
@@ -128,11 +137,11 @@ public class PortalParticipanteController {
     private int calculateProgress(EstadoParticipante estado) {
         return switch (estado) {
             case PENDIENTE_EXAMEN -> 0;
-            case EXAMEN_REALIZADO -> 5;
-            case ADMITIDO_EXAMEN -> 10;
-            case SOCIOECONOMICO_ENVIADO -> 20;
-            case ADMITIDO_SOCIOECONOMICO, ADMITIDO_FORMULARIO -> 30;
-            case PAPELERIA_ENVIADA -> 40;
+            case EXAMEN_REALIZADO -> 10;
+            case ADMITIDO_EXAMEN -> 30;
+            case SOCIOECONOMICO_ENVIADO -> 37;
+            case ADMITIDO_SOCIOECONOMICO, ADMITIDO_FORMULARIO -> 40;
+            case PAPELERIA_ENVIADA -> 45;
             case ADMITIDO_PAPELERIA -> 50;
             case CONTRATO_ENVIADO -> 62;
             case ADMITIDO_CONTRATO -> 70;

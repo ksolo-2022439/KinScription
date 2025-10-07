@@ -101,11 +101,12 @@ public class AdmParticipanteService {
         AdmParticipante participante = getById(participanteId)
                 .orElseThrow(() -> new RuntimeException("Participante no encontrado con ID: " + participanteId));
 
-        if (participante.getEstado() != EstadoParticipante.PENDIENTE_EXAMEN) {
-            throw new IllegalStateException("El participante no está en estado de pendiente de examen.");
+        if (participante.getEstado() != EstadoParticipante.EXAMEN_REALIZADO) {
+            throw new IllegalStateException("El participante no se encuentra en el estado correcto para ser calificado.");
         }
 
         participante.setNotaExamen(nota);
+
         if (nota.compareTo(new BigDecimal("60")) >= 0) {
             participante.setEstado(EstadoParticipante.ADMITIDO_EXAMEN);
         } else {

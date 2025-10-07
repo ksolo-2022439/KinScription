@@ -1,10 +1,50 @@
 <!DOCTYPE html>
-<html lang="en">
+<!-- Usaremos un layout de admin en el futuro, por ahora será simple -->
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Revisión de Exámenes</title>
+    <link rel="stylesheet" th:href="@{/style/admin_style.css}">
 </head>
 <body>
+<div class="admin-container">
+    <header class="admin-header">
+        <h1>Exámenes Pendientes de Calificación</h1>
+        <p>Participantes que han completado su evaluación y esperan una nota.</p>
+    </header>
 
+    <div th:if="${successMessage}" class="flash-success">
+        <p th:text="${successMessage}"></p>
+    </div>
+
+    <div class="admin-card">
+        <div th:if="${participantes.isEmpty()}">
+            <p>No hay exámenes pendientes de calificación en este momento.</p>
+        </div>
+
+        <table class="data-table" th:if="${!participantes.isEmpty()}">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombres</th>
+                <th>Apellidos</th>
+                <th>Grado de Aplicación</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="p : ${participantes}">
+                <td th:text="${p.id}">1</td>
+                <td th:text="${p.nombreCompleto}">Juan Carlos</td>
+                <td th:text="${p.apellidos}">Pérez Gómez</td>
+                <td th:text="${p.gradoAplica.nombreGrado}">Bachillerato</td>
+                <td>
+                    <a th:href="@{/admin/inscripcion/revisar/{id}(id=${p.id})}" class="btn-primary">Revisar</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
 </body>
 </html>

@@ -40,13 +40,11 @@ public class AdmEstudioSocioeconomico {
 
     // Aquí irían todos los demás campos del formulario con sus anotaciones ...
 
-    @NotNull(message = "El monto de inscripción debe ser definido.")
     @PositiveOrZero(message = "El monto no puede ser negativo.")
     @Digits(integer = 8, fraction = 2, message = "Formato de monto inválido.")
     @Column(name = "monto_inscripcion", precision = 10, scale = 2)
     private BigDecimal montoInscripcion;
 
-    @NotNull(message = "El monto de mensualidad debe ser definido.")
     @PositiveOrZero(message = "El monto no puede ser negativo.")
     @Digits(integer = 8, fraction = 2, message = "Formato de monto inválido.")
     @Column(name = "monto_mensualidad", precision = 10, scale = 2)
