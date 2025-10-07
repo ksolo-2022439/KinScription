@@ -57,12 +57,12 @@ public class AdmReportePagoService {
         return reportePagoRepository.findAll();
     }
 
-    public Optional<AdmReportePago> getById(long id) {
+    public Optional<AdmReportePago> getById(Integer id) {
         return reportePagoRepository.findById(id);
     }
 
     @Transactional
-    public Optional<AdmReportePago> update(long id, AdmReportePago newData) {
+    public Optional<AdmReportePago> update(Integer id, AdmReportePago newData) {
         return reportePagoRepository.findById(id).map(pago -> {
             pago.setConcepto(newData.getConcepto());
             pago.setMonto(newData.getMonto());
@@ -72,7 +72,7 @@ public class AdmReportePagoService {
     }
 
     @Transactional
-    public boolean delete(long id) {
+    public boolean delete(Integer id) {
         return getById(id).map(pago -> {
             reportePagoRepository.deleteById(id);
             return true;

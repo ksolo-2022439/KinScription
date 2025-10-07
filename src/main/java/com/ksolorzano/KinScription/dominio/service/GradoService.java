@@ -46,4 +46,8 @@ public class GradoService {
             return true;
         }).orElse(false);
     }
+
+    public long countTotal() {
+        return gradoRepository.count();
+    }
 }

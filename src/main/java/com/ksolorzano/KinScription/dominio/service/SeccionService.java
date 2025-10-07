@@ -46,4 +46,8 @@ public class SeccionService {
             return true;
         }).orElse(false);
     }
+
+    public long countTotal() {
+        return seccionRepository.count();
+    }
 }

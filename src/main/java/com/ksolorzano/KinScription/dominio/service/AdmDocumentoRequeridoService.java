@@ -51,12 +51,12 @@ public class AdmDocumentoRequeridoService {
         participanteService.save(participante);
     }
 
-    public Optional<AdmDocumentoRequerido> getById(long id) {
+    public Optional<AdmDocumentoRequerido> getById(Integer id) {
         return documentoRequeridoRepository.findById(id);
     }
 
     @Transactional
-    public Optional<AdmDocumentoRequerido> update(long id, AdmDocumentoRequerido newData) {
+    public Optional<AdmDocumentoRequerido> update(Integer id, AdmDocumentoRequerido newData) {
         return documentoRequeridoRepository.findById(id).map(doc -> {
             doc.setNombreDocumento(newData.getNombreDocumento());
             doc.setUrlArchivo(newData.getUrlArchivo());
@@ -66,7 +66,7 @@ public class AdmDocumentoRequeridoService {
     }
 
     @Transactional
-    public boolean delete(long id) {
+    public boolean delete(Integer id) {
         return getById(id).map(doc -> {
             documentoRequeridoRepository.deleteById(id);
             return true;

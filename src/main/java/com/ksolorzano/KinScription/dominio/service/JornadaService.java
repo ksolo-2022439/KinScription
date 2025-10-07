@@ -46,4 +46,8 @@ public class JornadaService {
             return true;
         }).orElse(false);
     }
+
+    public long countTotal() {
+        return jornadaRepository.count();
+    }
 }

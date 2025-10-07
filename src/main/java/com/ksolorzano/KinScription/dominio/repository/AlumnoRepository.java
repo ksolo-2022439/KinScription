@@ -1,19 +1,16 @@
 package com.ksolorzano.KinScription.dominio.repository;
 
-import com.ksolorzano.KinScription.persistence.entity.Administrador;
 import com.ksolorzano.KinScription.persistence.entity.Alumno;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface AlumnoRepository extends JpaRepository<Alumno, Integer> {
+public interface AlumnoRepository extends JpaRepository<Alumno, Integer>, JpaSpecificationExecutor<Alumno> {
 
     /**
      * Busca el carnet de alumno más alto que comienza con el prefijo del año actual.
@@ -36,6 +33,4 @@ public interface AlumnoRepository extends JpaRepository<Alumno, Integer> {
     boolean existsByEmailAcademico(String email);
 
     Optional<Alumno> findByCarnetAlumno(String carnet);
-
-    List<Alumno> findAll(Specification<Alumno> spec, Sort unsorted);
 }

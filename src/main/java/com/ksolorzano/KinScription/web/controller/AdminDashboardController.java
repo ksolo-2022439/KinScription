@@ -25,10 +25,10 @@ public class AdminDashboardController {
      */
     @GetMapping("/dashboard")
     public String adminDashboard(Model model) {
-        long pendientesExamen = participanteService.getByEstado(EstadoParticipante.PENDIENTE_EXAMEN).size();
-        long pendientesSocioeconomico = participanteService.getByEstado(EstadoParticipante.ADMITIDO_EXAMEN).size();
-        long pendientesPapeleria = participanteService.getByEstado(EstadoParticipante.ADMITIDO_FORMULARIO).size();
-        long finalizados = participanteService.getByEstado(EstadoParticipante.FINALIZADO).size();
+        Integer pendientesExamen = participanteService.getByEstado(EstadoParticipante.PENDIENTE_EXAMEN).size();
+        Integer pendientesSocioeconomico = participanteService.getByEstado(EstadoParticipante.ADMITIDO_EXAMEN).size();
+        Integer pendientesPapeleria = participanteService.getByEstado(EstadoParticipante.ADMITIDO_FORMULARIO).size();
+        Integer finalizados = participanteService.getByEstado(EstadoParticipante.FINALIZADO).size();
 
         model.addAttribute("countPendientesExamen", pendientesExamen);
         model.addAttribute("countPendientesSocioeconomico", pendientesSocioeconomico);

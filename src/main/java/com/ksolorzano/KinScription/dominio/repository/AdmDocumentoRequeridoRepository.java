@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface AdmDocumentoRequeridoRepository extends JpaRepository<AdmDocumentoRequerido, Long> {
+public interface AdmDocumentoRequeridoRepository extends JpaRepository<AdmDocumentoRequerido, Integer> {
 
     /**
      * Busca todos los documentos que han sido subidos por un participante específico.

@@ -11,7 +11,7 @@ public class Coordinador {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idCoordinador")
-    private Long idCoordinador;
+    private Integer idCoordinador;
 
     @Column(nullable = false, length = 100)
     private String nombreCompleto;
@@ -26,7 +26,7 @@ public class Coordinador {
     private String contrasena;
 
     @Column(name = "idGrado", nullable = false)
-    private Long idGrado;
+    private Integer idGrado;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idGrado", insertable = false, updatable = false)

@@ -15,7 +15,7 @@ public class Jornada {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idJornada")
-    private Long idJornada;
+    private Integer idJornada;
 
     @Column(name = "nombreJornada", nullable = false, unique = true)
     private String nombreJornada;

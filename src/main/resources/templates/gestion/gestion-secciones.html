@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title>Gestión de Secciones</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" th:href="@{/style/cruds.css(v=1.2)}">
+    <style>
+        .modal-content {
+            background-color: var(--primary-bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .form-control {
+            background-color: var(--secondary-bg-color);
+            color: var(--text-color);
+            border-color: var(--border-color);
+        }
+
+        .form-control:focus {
+            background-color: var(--secondary-bg-color);
+            color: var(--text-color);
+            border-color: var(--accent-color);
+            box-shadow: none;
+        }
+
+        .btn-close {
+            filter: invert(1) grayscale(100%) brightness(200%);
+        }
+    </style>
+</head>
+<body>
+<div class="layout-container">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <main class="main-content">
+        <div class="header-bar">
+            <h1>Gestión de Secciones</h1>
+            <a th:href="@{/gestion/secciones(action='new')}" class="add-button">＋ Nueva Sección</a>
+        </div>
+
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert"
+             th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert"
+             th:text="${errorMessage}"></div>
+
+        <div class="summary-cards">
+            <div class="card">
+                <h3 class="card-title">Total de Secciones</h3>
+                <p class="card-value" th:text="${totalSecciones}">0</p>
+            </div>
+            <div class="card">
+                <h3 class="card-title">Secciones Activas</h3>
+                <p class="card-value" th:text="${seccionesActivas}">0</p>
+            </div>
+        </div>
+
+        <div class="data-table-container">
+            <table class="data-table">
+                <thead>
+                <tr class="header-row">
+                    <th>ID</th>
+                    <th>Nombre de la Sección</th>
+                    <th>Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="seccion : ${secciones}">
+                    <td th:text="${seccion.idSeccion}"></td>
+                    <td th:text="${seccion.nombreSeccion}"></td>
+                    <td class="action-buttons">
+                        <a th:href="@{/gestion/secciones/editar/{id}(id=${seccion.idSeccion})}">
+                            <button type="button" class="edit" title="Editar">✏️</button>
+                        </a>
+                        <button type="button" class="delete" title="Eliminar"
+                                th:onclick="confirmAndDelete([[${seccion.idSeccion}]])">🗑️
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+
+<div class="modal fade" id="seccionModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form th:action="@{/gestion/secciones/guardar}" th:object="${seccion}" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel"
+                        th:text="*{idSeccion != null ? 'Editar Sección' : 'Nueva Sección'}">Formulario de Sección</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" th:field="*{idSeccion}"/>
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">Nombre de la Sección</label>
+                        <input type="text" class="form-control" id="nombre" th:field="*{nombreSeccion}" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a th:href="@{/gestion/secciones}" class="btn btn-secondary">Cancelar</a>
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<form id="deleteForm" method="post" style="display: none;"></form>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    document.addEventListener('DOMContentLoaded', function () {
+        const openModal = /*[[${openModal}]]*/ false;
+        if (openModal) {
+            var seccionModal = new bootstrap.Modal(document.getElementById('seccionModal'));
+            seccionModal.show();
+        }
+    });
+
+    function confirmAndDelete(id) {
+        if (confirm('¿Estás seguro de que quieres eliminar esta sección?')) {
+            const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+            let form = document.getElementById('deleteForm');
+            form.action = '/gestion/secciones/eliminar/' + id;
+
+            let csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = '_csrf';
+            csrfInput.value = token;
+            form.appendChild(csrfInput);
+
+            form.submit();
+        }
+    }
+
+    /*]]>*/
+</script>
+</body>
+</html>
