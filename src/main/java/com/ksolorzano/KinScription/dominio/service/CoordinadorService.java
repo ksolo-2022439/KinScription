@@ -39,6 +39,9 @@ public class CoordinadorService {
             coordinador.setApellidoCompleto(newData.getApellidoCompleto());
             coordinador.setEmail(newData.getEmail());
             coordinador.setIdGrado(newData.getIdGrado());
+            if (newData.getContrasena() != null && !newData.getContrasena().trim().isEmpty()) {
+                coordinador.setContrasena(newData.getContrasena());
+            }
             return coordinadorRepository.save(coordinador);
         });
     }

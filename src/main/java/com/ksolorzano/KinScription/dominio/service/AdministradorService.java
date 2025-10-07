@@ -56,7 +56,11 @@ public class AdministradorService {
             admin.setNombreCompleto(newData.getNombreCompleto());
             admin.setEmail(newData.getEmail());
             admin.setRol(newData.getRol());
-            // Opcional: Lógica para actualizar contraseña si se proporciona una nueva
+
+            if (newData.getPassword() != null && !newData.getPassword().trim().isEmpty()) {
+                admin.setPassword(newData.getPassword());
+            }
+
             return administradorRepository.save(admin);
         });
     }

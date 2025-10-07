@@ -1,6 +1,7 @@
 package com.ksolorzano.KinScription.dominio.service;
 
 import com.ksolorzano.KinScription.dominio.repository.AdmParticipanteRepository;
+import com.ksolorzano.KinScription.dominio.repository.AlumnoRepository;
 import com.ksolorzano.KinScription.persistence.entity.AdmParticipante;
 import com.ksolorzano.KinScription.persistence.entity.Alumno;
 import com.ksolorzano.KinScription.persistence.entity.EstadoParticipante;
@@ -20,20 +21,24 @@ public class AdmParticipanteService {
 
     private final AdmParticipanteRepository participanteRepository;
     private final AlumnoService alumnoService;
+    private final AlumnoRepository alumnoRepository;
 
     /**
      * Constructor para inyección de dependencias.
-     * @param repo Repositorio para la entidad AdmParticipante.
+     *
+     * @param repo       Repositorio para la entidad AdmParticipante.
      * @param aluService Servicio para la entidad Alumno.
      */
     @Autowired
-    public AdmParticipanteService(AdmParticipanteRepository repo, AlumnoService aluService) {
+    public AdmParticipanteService(AdmParticipanteRepository repo, AlumnoService aluService, AlumnoRepository alumRepo) {
         this.participanteRepository = repo;
         this.alumnoService = aluService;
+        this.alumnoRepository = alumRepo;
     }
 
     /**
      * Obtiene una lista de todos los participantes registrados en el sistema.
+     *
      * @return Una {@link List} de objetos {@link AdmParticipante}.
      */
     public List<AdmParticipante> getAll() {
@@ -42,15 +47,17 @@ public class AdmParticipanteService {
 
     /**
      * Busca un participante por su ID único.
+     *
      * @param id El ID del participante.
      * @return Un {@link Optional} que contiene al participante si se encuentra.
      */
     public Optional<AdmParticipante> getById(int id) {
-        return participanteRepository.findById(id);
+        return participanteRepository.findByIdActivo(id);
     }
 
     /**
      * Busca un participante por su nombre de usuario único utilizado para el login.
+     *
      * @param username El nombre de usuario del participante.
      * @return Un {@link Optional} que contiene al participante si se encuentra.
      */
@@ -60,6 +67,7 @@ public class AdmParticipanteService {
 
     /**
      * Guarda un nuevo participante o actualiza uno existente.
+     *
      * @param participante El objeto AdmParticipante a persistir.
      * @return El participante guardado.
      */
@@ -69,6 +77,7 @@ public class AdmParticipanteService {
 
     /**
      * Recupera una lista de participantes que se encuentran en un estado específico.
+     *
      * @param estado El {@link EstadoParticipante} por el cual filtrar.
      * @return Una {@link List} de participantes que coinciden con el estado.
      */
@@ -80,8 +89,9 @@ public class AdmParticipanteService {
      * Procesa la calificación del examen de admisión para un participante.
      * Cambia el estado del participante a ADMITIDO_EXAMEN si la nota es >= 60,
      * o a DESAPROBADO en caso contrario.
+     *
      * @param participanteId El ID del participante a calificar.
-     * @param nota La nota obtenida en el examen.
+     * @param nota           La nota obtenida en el examen.
      * @return El participante con su estado y nota actualizados.
      * @throws IllegalStateException Si el participante no se encuentra en el estado PENDIENTE_EXAMEN.
      */
@@ -110,6 +120,7 @@ public class AdmParticipanteService {
      * 1. Genera un carnet, un correo institucional y una contraseña por defecto.
      * 2. Crea y guarda una nueva entidad {@link Alumno} con los datos del participante.
      * 3. Actualiza el estado del participante a {@link EstadoParticipante#FINALIZADO}.
+     *
      * @param participanteId El ID del participante a finalizar.
      * @return El nuevo objeto {@link Alumno} que ha sido creado y guardado.
      * @throws IllegalStateException Si el participante no se encuentra en el estado ADMITIDO_CONTRATO.
@@ -120,19 +131,40 @@ public class AdmParticipanteService {
                 .orElseThrow(() -> new RuntimeException("Participante no encontrado con ID: " + participanteId));
 
         if (participante.getEstado() != EstadoParticipante.ADMITIDO_CONTRATO) {
-            throw new IllegalStateException("El participante no ha sido admitido por contrato para poder finalizar el proceso.");
+            throw new IllegalStateException("El participante no ha sido admitido por contrato.");
         }
 
-        String baseEmail = participante.getNombreCompleto().split(" ")[0].toLowerCase() + "." + participante.getApellidos().split(" ")[0].toLowerCase();
-        String emailAcademico = baseEmail + "@kinal.edu.gt";
-        String contrasenaDefault = "password123";
-        String carnet = "K" + java.time.Year.now().getValue() + "-" + participante.getId();
+        String anioActual = String.valueOf(java.time.Year.now().getValue());
+        String ultimoCarnet = alumnoRepository.findTopByCarnetAlumnoStartingWithOrderByCarnetAlumnoDesc(anioActual);
 
+        int nuevoNumero = 1;
+        if (ultimoCarnet != null) {
+            int ultimoNumero = Integer.parseInt(ultimoCarnet.substring(4));
+            nuevoNumero = ultimoNumero + 1;
+        }
+
+        String nuevoCarnet = anioActual + String.format("%03d", nuevoNumero);
+        if (alumnoRepository.existsByCarnetAlumno(nuevoCarnet)) {
+            throw new RuntimeException("Error de concurrencia: El carnet " + nuevoCarnet + " ya fue generado.");
+        }
+
+        String primeraLetraNombre = participante.getNombreCompleto().substring(0, 1).toLowerCase();
+        String primerApellido = participante.getApellidos().split(" ")[0].toLowerCase();
+        String emailAcademico = String.format("%s%s-%s@kinal.edu.gt",
+                primeraLetraNombre,
+                primerApellido,
+                nuevoCarnet);
+
+        if (alumnoRepository.existsByEmailAcademico(emailAcademico)) {
+            throw new RuntimeException("Error: El correo electrónico " + emailAcademico + " ya existe.");
+        }
+
+        String contrasenaDefault = "password123";
         Alumno nuevoAlumno = new Alumno();
-        nuevoAlumno.setCarnetAlumno(carnet);
+        nuevoAlumno.setCarnetAlumno(nuevoCarnet);
+        nuevoAlumno.setEmailAcademico(emailAcademico);
         nuevoAlumno.setNombreCompleto(participante.getNombreCompleto());
         nuevoAlumno.setApellidoCompleto(participante.getApellidos());
-        nuevoAlumno.setEmailAcademico(emailAcademico);
         nuevoAlumno.setContrasena(contrasenaDefault);
         nuevoAlumno.setDireccion(participante.getDireccion());
         nuevoAlumno.setIdGrado(participante.getGradoAplica().getIdGrado());
@@ -140,16 +172,15 @@ public class AdmParticipanteService {
         nuevoAlumno.setIdTutor(participante.getTutor().getIdTutor());
 
         Alumno alumnoCreado = alumnoService.save(nuevoAlumno);
-
         participante.setEstado(EstadoParticipante.FINALIZADO);
         save(participante);
-
         return alumnoCreado;
     }
 
     /**
      * Actualiza los datos personales de un participante existente.
-     * @param id El ID del participante a modificar.
+     *
+     * @param id      El ID del participante a modificar.
      * @param newData Un objeto AdmParticipante con la nueva información.
      * @return Un {@link Optional} con el participante actualizado.
      */
@@ -160,19 +191,23 @@ public class AdmParticipanteService {
             participante.setApellidos(newData.getApellidos());
             participante.setFechaNacimiento(newData.getFechaNacimiento());
             participante.setDireccion(newData.getDireccion());
+            if (newData.getPassword() != null && !newData.getPassword().trim().isEmpty()) {
+                participante.setPassword(newData.getPassword());
+            }
             return save(participante);
         });
     }
 
     /**
-     * Elimina un participante de la base de datos.
+     * Desactiva un participante en la base de datos.
+     *
      * @param id El ID del participante a eliminar.
-     * @return {@code true} si se eliminó con éxito, {@code false} si no se encontró.
      */
     @Transactional
-    public boolean delete(int id) {
-        return getById(id).map(participante -> {
-            participanteRepository.deleteById(id);
+    public boolean desactivar(int id) {
+        return participanteRepository.findById(id).map(participante -> {
+            participante.setActivo(false);
+            save(participante);
             return true;
         }).orElse(false);
     }

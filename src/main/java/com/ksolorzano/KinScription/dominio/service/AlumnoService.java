@@ -43,6 +43,9 @@ public class AlumnoService {
             alumno.setIdJornada(newData.getIdJornada());
             alumno.setIdCarrera(newData.getIdCarrera());
             alumno.setIdTutor(newData.getIdTutor());
+            if (newData.getContrasena() != null && !newData.getContrasena().trim().isEmpty()) {
+                alumno.setContrasena(newData.getContrasena());
+            }
             return alumnoRepository.save(alumno);
         });
     }

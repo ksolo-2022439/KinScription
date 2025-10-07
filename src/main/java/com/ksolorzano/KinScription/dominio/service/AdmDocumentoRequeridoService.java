@@ -45,7 +45,7 @@ public class AdmDocumentoRequeridoService {
             throw new IllegalStateException("El participante no ha completado el paso de formulario socioeconómico.");
         }
 
-        // Aquí podría ir una lógica para verificar que todos los documentos requeridos, pero la voy a omitir
+        // Aquí podría ir una lógica para verificar que todos los documentos requeridos esten, pero la voy a omitir
 
         participante.setEstado(EstadoParticipante.ADMITIDO_PAPELERIA);
         participanteService.save(participante);

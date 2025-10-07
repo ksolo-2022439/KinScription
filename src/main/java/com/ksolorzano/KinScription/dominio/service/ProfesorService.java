@@ -40,6 +40,9 @@ public class ProfesorService {
             profesor.setDireccion(newData.getDireccion());
             profesor.setNumeroTelefono(newData.getNumeroTelefono());
             profesor.setEmail(newData.getEmail());
+            if (newData.getContrasena() != null && !newData.getContrasena().trim().isEmpty()) {
+                profesor.setContrasena(newData.getContrasena());
+            }
             return profesorRepository.save(profesor);
         });
     }

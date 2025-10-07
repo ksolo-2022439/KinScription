@@ -52,4 +52,7 @@ public class AdmParticipante {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_tutor_generado") // se llena al aprobar el socioeconómico
     private Tutor tutor;
+
+    @Column(name = "activo", nullable = false)
+    private boolean activo = true;
 }

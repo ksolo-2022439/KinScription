@@ -124,10 +124,12 @@ public class AdmEstudioSocioeconomicoService {
         estudioSocioeconomicoRepository.save(estudio);
         participanteService.save(participante);
 
-        // Los montos de pago deberían determinarse a partir de la evaluación socioeconómica.
-        // Aquí se usan valores de ejemplo.
-        BigDecimal montoInscripcion = new BigDecimal("500.00");
-        BigDecimal montoMensualidad = new BigDecimal("850.00");
+        BigDecimal montoInscripcion = estudio.getMontoInscripcion();
+        BigDecimal montoMensualidad = estudio.getMontoMensualidad();
+        // Validamos que los montos no sean nulos antes de generar los pagos
+        if (montoInscripcion == null || montoMensualidad == null) {
+            throw new IllegalStateException("Los montos de inscripción y mensualidad no han sido definidos para este estudio.");
+        }
         reportePagoService.generarReporteDePagos(participante, montoInscripcion, montoMensualidad);
     }
 
@@ -144,7 +146,8 @@ public class AdmEstudioSocioeconomicoService {
             estudio.setDatosTutorApellido(newData.getDatosTutorApellido());
             estudio.setDatosTutorTelefono(newData.getDatosTutorTelefono());
             estudio.setDatosTutorDireccion(newData.getDatosTutorDireccion());
-            // Se podrían actualizar aquí los demás campos del formulario
+            estudio.setMontoInscripcion(newData.getMontoInscripcion());
+            estudio.setMontoMensualidad(newData.getMontoMensualidad());
             return estudioSocioeconomicoRepository.save(estudio);
         });
     }

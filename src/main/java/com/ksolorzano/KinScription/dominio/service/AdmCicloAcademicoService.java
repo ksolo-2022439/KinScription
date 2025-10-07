@@ -35,7 +35,8 @@ public class AdmCicloAcademicoService {
     public Optional<AdmCicloAcademico> update(int id, AdmCicloAcademico newData) {
         return cicloAcademicoRepository.findById(id).map(ciclo -> {
             ciclo.setNombre(newData.getNombre());
-            // Lógica para fechas de inicio/fin si las tuviera
+            ciclo.setFechaInicio(newData.getFechaInicio());
+            ciclo.setFechaFin(newData.getFechaFin());
             return cicloAcademicoRepository.save(ciclo);
         });
     }
