@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -96,7 +97,7 @@ public class AdmParticipanteService {
      * @throws IllegalStateException Si el participante no se encuentra en el estado PENDIENTE_EXAMEN.
      */
     @Transactional
-    public AdmParticipante calificarExamen(int participanteId, double nota) {
+    public AdmParticipante calificarExamen(int participanteId, BigDecimal nota) {
         AdmParticipante participante = getById(participanteId)
                 .orElseThrow(() -> new RuntimeException("Participante no encontrado con ID: " + participanteId));
 
@@ -105,7 +106,7 @@ public class AdmParticipanteService {
         }
 
         participante.setNotaExamen(nota);
-        if (nota >= 60) {
+        if (nota.compareTo(new BigDecimal("60")) >= 0) {
             participante.setEstado(EstadoParticipante.ADMITIDO_EXAMEN);
         } else {
             participante.setEstado(EstadoParticipante.DESAPROBADO);

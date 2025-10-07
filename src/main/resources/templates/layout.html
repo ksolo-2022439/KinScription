@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title layout:title-pattern="$CONTENT_TITLE | $LAYOUT_TITLE">KinScription</title>
+    <link rel="stylesheet" th:href="@{/style/dashboard.css}">
+</head>
+<body>
+<div class="page-container">
+
+    <aside class="sidebar">
+        <div class="logo">
+            <a th:href="@{/}">KinScription</a>
+        </div>
+
+        <div class="profile-card">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <h3 th:text="${participante.nombreCompleto} + ' ' + ${participante.apellidos}"></h3>
+            <p class="profile-meta" th:text="${participante.gradoAplica.nombreGrado}"></p>
+        </div>
+
+        <div class="status-card">
+            <p class="status-title">Estado del Proceso</p>
+            <span class="status-tag" th:text="${#strings.replace(participante.estado.name(), '_', ' ')}"></span>
+        </div>
+
+        <div class="logout-section">
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="btn-logout">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                    <span>Cerrar Sesión</span>
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <div class="content-wrapper" layout:fragment="content">
+        <p>El contenido de la página irá aquí si no se define.</p>
+    </div>
+
+</div>
+</body>
+</html>

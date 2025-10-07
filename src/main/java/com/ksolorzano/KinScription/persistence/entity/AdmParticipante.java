@@ -6,6 +6,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
@@ -50,7 +52,7 @@ public class AdmParticipante {
     private EstadoParticipante estado;
 
     @Column(name = "nota_examen", precision = 5, scale = 2)
-    private Double notaExamen;
+    private BigDecimal notaExamen;
 
     @Column(name = "activo", nullable = false)
     private boolean activo = true;

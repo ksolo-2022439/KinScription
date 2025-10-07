@@ -1,0 +1,175 @@
+/* ==============================
+   KinScription Login Styles
+   ============================== */
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #e6f0ff, #f4f9ff);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    color: #0d1b2a;
+}
+
+.login-container {
+    width: 100%;
+    max-width: 950px;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 60, 150, 0.15);
+    overflow: hidden;
+    display: flex;
+    transition: all 0.3s ease;
+}
+
+.login-box {
+    display: flex;
+    width: 100%;
+    min-height: 550px;
+}
+
+.login-form {
+    flex: 1;
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.login-form h2 {
+    margin-bottom: 0.5rem;
+    color: #003366;
+    font-size: 1.8rem;
+}
+
+.subtitle {
+    margin-bottom: 2rem;
+    color: #5c6b80;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1.5rem;
+}
+
+.input-group label {
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+    color: #003366;
+}
+
+.input-group input {
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    border: 1px solid #b5c6e0;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: #0078ff;
+    box-shadow: 0 0 5px rgba(0, 120, 255, 0.3);
+}
+
+.options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.8rem;
+    font-size: 0.9rem;
+}
+
+.remember input {
+    margin-right: 0.4rem;
+}
+
+.link {
+    color: #0078ff;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.link:hover {
+    text-decoration: underline;
+}
+
+.btn-login {
+    width: 100%;
+    padding: 0.9rem;
+    background: linear-gradient(135deg, #0078ff, #4bb8ff);
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-login:hover {
+    background: linear-gradient(135deg, #005fcc, #36a2ff);
+    transform: translateY(-2px);
+}
+
+.register-section {
+    text-align: center;
+    margin-top: 1.5rem;
+}
+
+.register-section a {
+    color: #0078ff;
+    font-weight: 600;
+}
+
+.login-illustration {
+    flex: 1;
+    background: linear-gradient(135deg, #4bb8ff, #0078ff);
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.wave-bg {
+    position: absolute;
+    width: 150%;
+    height: 150%;
+    background: radial-gradient(circle at 30% 40%, rgba(255, 255, 255, 0.3), transparent 60%),
+    radial-gradient(circle at 70% 60%, rgba(255, 255, 255, 0.15), transparent 60%);
+    transform: rotate(-5deg);
+}
+
+.logo-area {
+    position: relative;
+    text-align: center;
+    z-index: 2;
+}
+
+.logo-area h1 {
+    font-size: 2.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.logo-area p {
+    font-size: 1.1rem;
+    font-weight: 300;
+}
+
+@media (max-width: 850px) {
+    .login-box {
+        flex-direction: column;
+    }
+
+    .login-illustration {
+        min-height: 200px;
+        padding: 1.5rem 0;
+    }
+}

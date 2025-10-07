@@ -1,10 +1,13 @@
 package com.ksolorzano.KinScription.dominio.repository;
 
+import com.ksolorzano.KinScription.persistence.entity.Administrador;
 import com.ksolorzano.KinScription.persistence.entity.Alumno;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
 
 @Repository
 public interface AlumnoRepository extends JpaRepository<Alumno, Integer> {
@@ -20,4 +23,6 @@ public interface AlumnoRepository extends JpaRepository<Alumno, Integer> {
 
     boolean existsByCarnetAlumno(String carnet);
     boolean existsByEmailAcademico(String email);
+
+    Optional<Alumno> findByCarnetAlumno(String carnet);
 }

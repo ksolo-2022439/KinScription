@@ -1,7 +1,8 @@
-package com.ksolorzano.KinScription.config;
+package com.ksolorzano.KinScription.dominio.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
@@ -22,18 +23,16 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/css/**", "/js/**", "/images/**", "/vendor/**").permitAll()
+                        .requestMatchers("/css/**", "/style/**", "/js/**", "/images/**", "/vendor/**").permitAll()
                         .requestMatchers("/login").permitAll()
-
-                        // --- REGLAS DE ACCESO POR ROL ---
                         .requestMatchers("/portal/**").hasRole("PARTICIPANTE")
                         .requestMatchers("/admin/inscripcion/**").hasRole("ADMIN_INSCRIPCION")
                         .requestMatchers("/admin/director/**").hasRole("DIRECTOR_ADMIN")
                         .requestMatchers("/admin/orientacion/**").hasRole("ORIENTACION")
                         .requestMatchers("/admin/secretaria/**").hasRole("SECRETARIA")
-
                         .anyRequest().authenticated()
                 )
+
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/perform_login")
@@ -41,6 +40,9 @@ public class SecurityConfig {
                         .failureUrl("/login?error=true")
                         .permitAll()
                 )
+
+                .rememberMe(Customizer.withDefaults())
+
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout=true")
