@@ -46,4 +46,8 @@ public class CarreraService {
             return true;
         }).orElse(false);
     }
+
+    public long countTotal() {
+        return carreraRepository.count();
+    }
 }

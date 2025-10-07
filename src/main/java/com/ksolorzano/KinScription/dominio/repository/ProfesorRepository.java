@@ -2,11 +2,12 @@ package com.ksolorzano.KinScription.dominio.repository;
 
 import com.ksolorzano.KinScription.persistence.entity.Profesor;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-public interface ProfesorRepository extends JpaRepository<Profesor, Integer> {
+public interface ProfesorRepository extends JpaRepository<Profesor, Integer>, JpaSpecificationExecutor<Profesor> {
     Optional<Profesor> findByEmail(String email);
 }
