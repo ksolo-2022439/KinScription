@@ -1,8 +1,11 @@
 package com.ksolorzano.KinScription.dominio.service;
 
 import com.ksolorzano.KinScription.dominio.repository.AlumnoRepository;
+import com.ksolorzano.KinScription.dominio.repository.specification.AlumnoSpecification;
 import com.ksolorzano.KinScription.persistence.entity.Alumno;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +31,6 @@ public class AlumnoService {
     }
 
     public Alumno save(Alumno alumno) {
-        // TODO: Lógica para generar carnet, email, etc.
         return alumnoRepository.save(alumno);
     }
 
@@ -57,5 +59,14 @@ public class AlumnoService {
             alumnoRepository.deleteById(id);
             return true;
         }).orElse(false);
+    }
+
+    public long countTotal() {
+        return alumnoRepository.count();
+    }
+
+    public List<Alumno> buscarAlumnos(String carnet, String nombre, String email, Long gradoId, Long seccionId, Long carreraId) {
+        Specification<Alumno> spec = AlumnoSpecification.getSpec(carnet, nombre, email, gradoId, seccionId, carreraId);
+        return alumnoRepository.findAll(spec, Sort.unsorted());
     }
 }
