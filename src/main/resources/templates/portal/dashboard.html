@@ -19,7 +19,9 @@
         <div class="progress-line-bg"></div>
         <div class="progress-line-fg" th:style="'width: ' + ${progressPercentage} + '%;'"></div>
 
-        <div class="step" th:classappend="${#lists.contains({'PENDIENTE_EXAMEN', 'ADMITIDO_EXAMEN', 'ADMITIDO_SOCIOECONOMICO', 'ADMITIDO_FORMULARIO', 'ADMITIDO_PAPELERIA', 'ADMITIDO_CONTRATO', 'FINALIZADO'}, participante.estado)} ? 'active' : ''">
+        <div class="step"
+             th:classappend="${participante.estado.name() == 'PENDIENTE_EXAMEN'} ? 'active'
+                    : (${participante.estado.name() != 'DESAPROBADO'} ? 'completed' : '')">
             <div class="circle">
                 <span class="step-number">1</span>
                 <svg class="step-check" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
@@ -27,7 +29,10 @@
             <p>Examen</p>
         </div>
 
-        <div class="step" th:classappend="${#lists.contains({'ADMITIDO_SOCIOECONOMICO', 'ADMITIDO_FORMULARIO', 'ADMITIDO_PAPELERIA', 'ADMITIDO_CONTRATO', 'FINALIZADO'}, participante.estado)} ? 'completed' : (${participante.estado.name() == 'ADMITIDO_EXAMEN'} ? 'active' : '')">
+        <div class="step"
+             th:classappend="${participante.estado.name() == 'ADMITIDO_EXAMEN'} ? 'active'
+                   : (${#lists.contains({'PENDIENTE_EXAMEN', 'EXAMEN_REALIZADO', 'DESAPROBADO'}, participante.estado.name())} ? ''
+                   : 'completed')">
             <div class="circle">
                 <span class="step-number">2</span>
                 <svg class="step-check" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>

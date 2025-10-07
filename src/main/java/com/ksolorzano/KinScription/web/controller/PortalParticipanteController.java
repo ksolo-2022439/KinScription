@@ -139,7 +139,7 @@ public class PortalParticipanteController {
             case PENDIENTE_EXAMEN -> 0;
             case EXAMEN_REALIZADO -> 10;
             case ADMITIDO_EXAMEN -> 30;
-            case SOCIOECONOMICO_ENVIADO -> 37;
+            case SOCIOECONOMICO_ENVIADO -> 30;
             case ADMITIDO_SOCIOECONOMICO, ADMITIDO_FORMULARIO -> 40;
             case PAPELERIA_ENVIADA -> 45;
             case ADMITIDO_PAPELERIA -> 50;

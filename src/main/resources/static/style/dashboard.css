@@ -80,12 +80,19 @@ body {
     font-weight: 600;
     color: rgba(255, 255, 255, 0.7);
 }
+
 .status-tag {
     background-color: var(--primary-blue);
     padding: 0.3rem 0.8rem;
     border-radius: 20px;
     font-size: 0.9rem;
     font-weight: 500;
+    white-space: normal;
+    word-break: keep-all;
+    display: inline-block;
+    max-width: 200px;
+    text-transform: uppercase;
+    text-align: center;
 }
 
 .logout-section {
