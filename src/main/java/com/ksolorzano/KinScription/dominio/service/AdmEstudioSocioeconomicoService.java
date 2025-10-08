@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -168,5 +169,13 @@ public class AdmEstudioSocioeconomicoService {
             estudioSocioeconomicoRepository.deleteById(id);
             return true;
         }).orElse(false);
+    }
+
+    /**
+     * Obtiene una lista de todos los estudios socioeconómicos registrados.
+     * @return Una lista de todas las entidades AdmEstudioSocioeconomico.
+     */
+    public List<AdmEstudioSocioeconomico> getAll() {
+        return estudioSocioeconomicoRepository.findAll();
     }
 }

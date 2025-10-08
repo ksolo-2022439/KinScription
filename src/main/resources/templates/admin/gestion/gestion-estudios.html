@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/admin_layout}">
+<head>
+    <title>Gestión de Estudios Socioeconómicos</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <a th:href="@{/admin/gestion}" class="back-link">&larr; Volver al Menú de Gestión</a>
+    <header class="admin-header">
+        <h1>Gestión de Estudios Socioeconómicos</h1>
+        <p>Ver y editar todos los formularios enviados por los participantes.</p>
+    </header>
+
+    <div th:if="${successMessage}" class="flash-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="flash-error" th:text="${errorMessage}"></div>
+
+    <div class="admin-card">
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Participante</th>
+                    <th>Tutor</th>
+                    <th>Inscripción (Q)</th>
+                    <th>Mensualidad (Q)</th>
+                    <th>Aprob. Director</th>
+                    <th>Aprob. Orientación</th>
+                    <th>Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="e : ${estudios}">
+                    <td th:text="${e.id}"></td>
+                    <td th:text="${e.participante.nombreCompleto}"></td>
+                    <td th:text="${e.datosTutorNombre} + ' ' + ${e.datosTutorApellido}"></td>
+                    <td th:text="${#numbers.formatDecimal(e.montoInscripcion, 1, 'COMMA', 2, 'POINT')}"></td>
+                    <td th:text="${#numbers.formatDecimal(e.montoMensualidad, 1, 'COMMA', 2, 'POINT')}"></td>
+                    <td>
+                        <span th:text="${e.aprobadoDirector ? 'Sí' : 'No'}"
+                              th:classappend="${e.aprobadoDirector ? 'badge success' : 'badge pending'}"></span>
+                    </td>
+                    <td>
+                        <span th:text="${e.aprobadoOrientacion ? 'Sí' : 'No'}"
+                              th:classappend="${e.aprobadoOrientacion ? 'badge success' : 'badge pending'}"></span>
+                    </td>
+                    <td class="action-buttons">
+                        <button class="btn-secondary" th:onclick="openModal([[${e}]])">Editar</button>
+                        <form th:action="@{/admin/gestion/estudios/eliminar/{id}(id=${e.id})}" method="post"
+                              onsubmit="return confirm('¿Estás seguro?');" style="display: inline;">
+                            <button type="submit" class="btn-danger">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="crudModal" class="modal">
+        <div class="modal-content">
+            <header class="modal-header">
+                <h3 id="modalTitle">Editar Estudio Socioeconómico</h3>
+                <span class="close-button" onclick="closeModal()">&times;</span>
+            </header>
+            <div class="modal-body">
+                <form id="estudioForm" th:action="@{/admin/gestion/estudios/guardar}" th:object="${estudio}"
+                      method="post">
+                    <input type="hidden" th:field="*{id}"/>
+                    <input type="hidden" th:field="*{participante}"/>
+
+                    <div class="form-group">
+                        <label>ID Participante:</label>
+                        <p id="modalParticipanteId" style="font-weight: bold;"></p>
+                    </div>
+                    <hr>
+                    <div class="form-group">
+                        <label for="datosTutorNombre">Nombre del Tutor</label>
+                        <input type="text" id="datosTutorNombre" th:field="*{datosTutorNombre}" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="datosTutorApellido">Apellido del Tutor</label>
+                        <input type="text" id="datosTutorApellido" th:field="*{datosTutorApellido}"
+                               class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="datosTutorTelefono">Teléfono del Tutor</label>
+                        <input type="text" id="datosTutorTelefono" th:field="*{datosTutorTelefono}"
+                               class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="datosTutorDireccion">Dirección del Tutor</label>
+                        <input type="text" id="datosTutorDireccion" th:field="*{datosTutorDireccion}"
+                               class="form-control">
+                    </div>
+                    <hr>
+                    <div class="form-group">
+                        <label for="montoInscripcion">Monto Inscripción (Q)</label>
+                        <input type="number" id="montoInscripcion" th:field="*{montoInscripcion}" class="form-control"
+                               step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="montoMensualidad">Monto Mensualidad (Q)</label>
+                        <input type="number" id="montoMensualidad" th:field="*{montoMensualidad}" class="form-control"
+                               step="0.01">
+                    </div>
+                    <hr>
+                    <div class="form-group-checkbox">
+                        <input type="checkbox" id="aprobadoDirector" th:field="*{aprobadoDirector}">
+                        <label for="aprobadoDirector">Aprobado por Director</label>
+                    </div>
+                    <div class="form-group-checkbox">
+                        <input type="checkbox" id="aprobadoOrientacion" th:field="*{aprobadoOrientacion}">
+                        <label for="aprobadoOrientacion">Aprobado por Orientación</label>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn-secondary" onclick="closeModal()">Cancelar</button>
+                        <button type="submit" class="btn-primary">Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div id="modalBackdrop" class="modal-backdrop" onclick="closeModal()"></div>
+
+    <script th:inline="javascript">
+        const modal = document.getElementById('crudModal');
+        const backdrop = document.getElementById('modalBackdrop');
+        const form = document.getElementById('estudioForm');
+
+        function openModal(estudio) {
+            form.reset();
+            if (estudio) {
+                form.querySelector('[name="id"]').value = estudio.id;
+                form.querySelector('[name="participante"]').value = estudio.participante.id;
+                document.getElementById('modalParticipanteId').textContent = estudio.participante.id;
+
+                form.querySelector('[name="datosTutorNombre"]').value = estudio.datosTutorNombre;
+                form.querySelector('[name="datosTutorApellido"]').value = estudio.datosTutorApellido;
+                form.querySelector('[name="datosTutorTelefono"]').value = estudio.datosTutorTelefono;
+                form.querySelector('[name="datosTutorDireccion"]').value = estudio.datosTutorDireccion;
+
+                form.querySelector('[name="montoInscripcion"]').value = estudio.montoInscripcion;
+                form.querySelector('[name="montoMensualidad"]').value = estudio.montoMensualidad;
+
+                form.querySelector('[name="aprobadoDirector"]').checked = estudio.aprobadoDirector;
+                form.querySelector('[name="aprobadoOrientacion"]').checked = estudio.aprobadoOrientacion;
+            }
+            modal.classList.add('show');
+            backdrop.classList.add('show');
+        }
+
+        function closeModal() {
+            modal.classList.remove('show');
+            backdrop.classList.remove('show');
+        }
+    </script>
+</main>
+</body>
+</html>

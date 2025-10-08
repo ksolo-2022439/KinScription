@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/admin_layout}">
+<head>
+    <title>Gestión de Contratos</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <a th:href="@{/admin/gestion}" class="back-link">&larr; Volver al Menú de Gestión</a>
+    <header class="admin-header">
+        <h1>Gestión de Contratos</h1>
+        <p>Ver y editar los registros de contratos subidos por los participantes.</p>
+    </header>
+
+    <div th:if="${successMessage}" class="flash-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="flash-error" th:text="${errorMessage}"></div>
+
+    <div class="admin-card">
+        <table class="data-table">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Participante</th>
+                <th>Abogado</th>
+                <th>Colegiado</th>
+                <th>Aprobado</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="c : ${contratos}">
+                <td th:text="${c.id}"></td>
+                <td th:text="${c.participante.nombreCompleto} + ' ' + ${c.participante.apellidos}"></td>
+                <td th:text="${c.nombreAbogado}"></td>
+                <td th:text="${c.colegiadoAbogado}"></td>
+                <td>
+                    <span th:text="${c.aprobado ? 'Sí' : 'No'}"
+                          th:classappend="${c.aprobado ? 'badge success' : 'badge pending'}"></span>
+                </td>
+                <td class="action-buttons">
+                    <button class="btn-secondary" th:onclick="openModal([[${c}]])">Editar</button>
+                    <form th:action="@{/admin/gestion/contratos/eliminar/{id}(id=${c.id})}" method="post"
+                          onsubmit="return confirm('¿Estás seguro de que quieres eliminar este contrato?');"
+                          style="display: inline;">
+                        <button type="submit" class="btn-danger">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="crudModal" class="modal" th:classappend="${showModal} ? 'show' : ''">
+        <div class="modal-content">
+            <header class="modal-header">
+                <h3 id="modalTitle">Editar Contrato</h3>
+                <span class="close-button" onclick="closeModal()">&times;</span>
+            </header>
+            <div class="modal-body">
+                <form id="contratoForm" th:action="@{/admin/gestion/contratos/guardar}" th:object="${contrato}"
+                      method="post">
+                    <input type="hidden" th:field="*{id}"/>
+                    <input type="hidden" th:field="*{participante}"/>
+
+                    <div class="form-group">
+                        <label>ID Participante:</label>
+                        <p th:text="*{participante != null ? participante.id : 'N/A'}" style="font-weight: bold;"></p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="nombreAbogado">Nombre del Abogado</label>
+                        <input type="text" id="nombreAbogado" th:field="*{nombreAbogado}" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="colegiadoAbogado">Colegiado del Abogado</label>
+                        <input type="text" id="colegiadoAbogado" th:field="*{colegiadoAbogado}" class="form-control"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="urlPdfContrato">URL del Archivo</label>
+                        <input type="text" id="urlPdfContrato" th:field="*{urlPdfContrato}" class="form-control"
+                               readonly>
+                        <small>Este campo es de solo lectura.</small>
+                    </div>
+
+                    <div class="form-group-checkbox">
+                        <input type="checkbox" id="aprobado" th:field="*{aprobado}">
+                        <label for="aprobado">Aprobado</label>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn-secondary" onclick="closeModal()">Cancelar</button>
+                        <button type="submit" class="btn-primary">Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div id="modalBackdrop" class="modal-backdrop" th:classappend="${showModal} ? 'show' : ''"
+         onclick="closeModal()"></div>
+
+    <script th:inline="javascript">
+
+        const modal = document.getElementById('crudModal');
+        const backdrop = document.getElementById('modalBackdrop');
+        const form = document.getElementById('contratoForm');
+
+        function openModal(contrato) {
+            form.reset();
+            if (contrato) {
+                form.querySelector('[name="id"]').value = contrato.id;
+                form.querySelector('[name="participante"]').value = contrato.participante.id;
+                form.querySelector('p').textContent = contrato.participante.id;
+                form.querySelector('[name="nombreAbogado"]').value = contrato.nombreAbogado;
+                form.querySelector('[name="colegiadoAbogado"]').value = contrato.colegiadoAbogado;
+                form.querySelector('[name="urlPdfContrato"]').value = contrato.urlPdfContrato;
+                form.querySelector('[name="aprobado"]').checked = contrato.aprobado;
+            }
+            modal.classList.add('show');
+            backdrop.classList.add('show');
+        }
+
+        function closeModal() {
+            modal.classList.remove('show');
+            backdrop.classList.remove('show');
+        }
+    </script>
+</main>
+</body>
+</html>

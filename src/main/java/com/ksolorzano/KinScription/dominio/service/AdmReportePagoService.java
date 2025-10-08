@@ -78,4 +78,8 @@ public class AdmReportePagoService {
             return true;
         }).orElse(false);
     }
+
+    public AdmReportePago save(AdmReportePago pago) {
+        return reportePagoRepository.save(pago);
+    }
 }

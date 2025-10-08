@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/admin_layout}">
+<head>
+    <title>Gestión de Reportes de Pago</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <a th:href="@{/admin/gestion}" class="back-link">&larr; Volver al Menú de Gestión</a>
+    <header class="admin-header">
+        <h1>Gestión de Reportes de Pago</h1>
+        <p>Ver y editar todos los registros de pago generados para los participantes.</p>
+    </header>
+
+    <div th:if="${successMessage}" class="flash-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="flash-error" th:text="${errorMessage}"></div>
+
+    <div class="admin-card">
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Participante</th>
+                    <th>Concepto</th>
+                    <th>Monto (Q)</th>
+                    <th>Fecha de Generación</th>
+                    <th>Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="p : ${pagos}">
+                    <td th:text="${p.id}"></td>
+                    <td th:text="${p.participante?.nombreCompleto}"></td>
+                    <td th:text="${p.concepto}"></td>
+                    <td th:text="${#numbers.formatDecimal(p.monto, 1, 'COMMA', 2, 'POINT')}"></td>
+                    <td th:text="${#temporals.format(p.fechaGeneracion, 'dd/MM/yyyy')}"></td>
+                    <td class="action-buttons">
+                        <button class="btn-secondary" th:onclick="openModal([[${p}]])">Editar</button>
+                        <form th:action="@{/admin/gestion/pagos/eliminar/{id}(id=${p.id})}" method="post"
+                              onsubmit="return confirm('¿Estás seguro?');" style="display: inline;">
+                            <button type="submit" class="btn-danger">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="crudModal" class="modal">
+        <div class="modal-content">
+            <header class="modal-header">
+                <h3 id="modalTitle">Editar Registro de Pago</h3>
+                <span class="close-button" onclick="closeModal()">&times;</span>
+            </header>
+            <div class="modal-body">
+                <form id="pagoForm" th:action="@{/admin/gestion/pagos/guardar}" th:object="${pago}" method="post">
+                    <input type="hidden" th:field="*{id}"/>
+                    <input type="hidden" th:field="*{participante}"/>
+
+                    <div class="form-group">
+                        <label>ID Participante:</label>
+                        <p id="modalParticipanteId" style="font-weight: bold;"></p>
+                    </div>
+                    <hr>
+                    <div class="form-group">
+                        <label for="concepto">Concepto</label>
+                        <input type="text" id="concepto" th:field="*{concepto}" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="monto">Monto (Q)</label>
+                        <input type="number" id="monto" th:field="*{monto}" class="form-control" required step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="fechaGeneracion">Fecha de Generación</label>
+                        <input type="date" id="fechaGeneracion" th:field="*{fechaGeneracion}" class="form-control"
+                               required>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn-secondary" onclick="closeModal()">Cancelar</button>
+                        <button type="submit" class="btn-primary">Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div id="modalBackdrop" class="modal-backdrop" onclick="closeModal()"></div>
+
+    <script th:inline="javascript">
+        const modal = document.getElementById('crudModal');
+        const backdrop = document.getElementById('modalBackdrop');
+        const form = document.getElementById('pagoForm');
+
+        function openModal(pago) {
+            form.reset();
+            if (pago) {
+                form.querySelector('[name="id"]').value = pago.id;
+                form.querySelector('[name="participante"]').value = pago.participante.id;
+                document.getElementById('modalParticipanteId').textContent = pago.participante.id + ' - ' + pago.participante.nombreCompleto;
+
+                form.querySelector('[name="concepto"]').value = pago.concepto;
+                form.querySelector('[name="monto"]').value = pago.monto;
+                form.querySelector('[name="fechaGeneracion"]').value = pago.fechaGeneracion;
+            }
+            modal.classList.add('show');
+            backdrop.classList.add('show');
+        }
+
+        function closeModal() {
+            modal.classList.remove('show');
+            backdrop.classList.remove('show');
+        }
+    </script>
+</main>
+</body>
+</html>

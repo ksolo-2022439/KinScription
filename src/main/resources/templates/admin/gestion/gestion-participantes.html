@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/admin_layout}">
+<head>
+    <title>Gestión de Participantes</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <a th:href="@{/admin/gestion}" class="back-link">&larr; Volver al Menú de Gestión</a>
+    <header class="admin-header">
+        <h1>Gestión de Participantes</h1>
+        <p>Crear, editar y desactivar los registros de los aspirantes.</p>
+    </header>
+
+    <div class="controls-bar">
+        <button class="btn-primary" onclick="openModal(null)">＋ Nuevo Participante</button>
+    </div>
+
+    <div th:if="${successMessage}" class="flash-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="flash-error" th:text="${errorMessage}"></div>
+
+    <div class="admin-card">
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Usuario</th>
+                    <th>Nombre Completo</th>
+                    <th>Grado</th>
+                    <th>Carrera</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="p : ${participantes}">
+                    <td th:text="${p.id}"></td>
+                    <td th:text="${p.username}"></td>
+                    <td th:text="${p.nombreCompleto} + ' ' + ${p.apellidos}"></td>
+                    <td th:text="${p.gradoAplica?.nombreGrado}"></td>
+                    <td th:text="${p.carreraAplica?.nombreCarrera ?: 'N/A'}"></td>
+                    <td><span class="badge pending" th:text="${#strings.replace(p.estado.name(), '_', ' ')}"></span>
+                    </td>
+                    <td class="action-buttons">
+                        <button class="btn-secondary" th:onclick="openModal([[${p}]])">Editar</button>
+                        <form th:action="@{/admin/gestion/participantes/desactivar/{id}(id=${p.id})}" method="post"
+                              onsubmit="return confirm('¿Seguro que quieres desactivar a este participante?');"
+                              style="display: inline;">
+                            <button type="submit" class="btn-danger">Desactivar</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="crudModal" class="modal" th:classappend="${showModal} ? 'show' : ''">
+        <div class="modal-content">
+            <header class="modal-header">
+                <h3 id="modalTitle">Nuevo Participante</h3>
+                <span class="close-button" onclick="closeModal()">&times;</span>
+            </header>
+            <div class="modal-body">
+                <form id="participanteForm" th:action="@{/admin/gestion/participantes/guardar}"
+                      th:object="${participante}" method="post">
+                    <input type="hidden" th:field="*{id}"/>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="nombreCompleto">Nombres</label>
+                            <input type="text" id="nombreCompleto" th:field="*{nombreCompleto}" class="form-control">
+                            <p class="error-message" th:if="${#fields.hasErrors('nombreCompleto')}"
+                               th:errors="*{nombreCompleto}"></p>
+                        </div>
+                        <div class="form-group">
+                            <label for="apellidos">Apellidos</label>
+                            <input type="text" id="apellidos" th:field="*{apellidos}" class="form-control">
+                            <p class="error-message" th:if="${#fields.hasErrors('apellidos')}"
+                               th:errors="*{apellidos}"></p>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="direccion">Dirección</label>
+                        <input type="text" id="direccion" th:field="*{direccion}" class="form-control">
+                        <p class="error-message" th:if="${#fields.hasErrors('direccion')}" th:errors="*{direccion}"></p>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="username">Usuario (Login)</label>
+                            <input type="text" id="username" th:field="*{username}" class="form-control">
+                            <p class="error-message" th:if="${#fields.hasErrors('username')}"
+                               th:errors="*{username}"></p>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Contraseña</label>
+                            <input type="password" id="password" th:field="*{password}" class="form-control"
+                                   th:placeholder="*{id != null ? 'Dejar en blanco para no cambiar' : ''}">
+                            <p class="error-message" th:if="${#fields.hasErrors('password')}"
+                               th:errors="*{password}"></p>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="fechaNacimiento">Fecha de Nacimiento</label>
+                            <input type="date" id="fechaNacimiento" th:field="*{fechaNacimiento}" class="form-control">
+                            <p class="error-message" th:if="${#fields.hasErrors('fechaNacimiento')}"
+                               th:errors="*{fechaNacimiento}"></p>
+                        </div>
+                        <div class="form-group">
+                            <label for="estado">Estado Actual</label>
+                            <select id="estado" th:field="*{estado}" class="form-control">
+                                <option th:each="e : ${estados}" th:value="${e}"
+                                        th:text="${#strings.replace(e.name(), '_', ' ')}"></option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="gradoAplica">Grado al que Aplica</label>
+                            <select id="gradoAplica" th:field="*{gradoAplica}" class="form-control">
+                                <option value="">-- Seleccione un Grado --</option>
+                                <option th:each="g : ${grados}" th:value="${g.idGrado}"
+                                        th:text="${g.nombreGrado}"></option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="carreraAplica">Carrera (Opcional)</label>
+                            <select id="carreraAplica" th:field="*{carreraAplica}" class="form-control">
+                                <option value="">-- Seleccione una Carrera --</option>
+                                <option th:each="c : ${carreras}" th:value="${c.idCarrera}"
+                                        th:text="${c.nombreCarrera}"></option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cicloAcademico">Ciclo de Admisión</label>
+                        <select id="cicloAcademico" th:field="*{cicloAcademico}" class="form-control">
+                            <option value="">-- Seleccione un Ciclo --</option>
+                            <option th:each="c : ${ciclos}" th:value="${c.id}" th:text="${c.nombre}"></option>
+                        </select>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn-secondary" onclick="closeModal()">Cancelar</button>
+                        <button type="submit" class="btn-primary">Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div id="modalBackdrop" class="modal-backdrop" onclick="closeModal()"></div>
+
+    <script th:inline="javascript">
+        const modal = document.getElementById('crudModal');
+        const backdrop = document.getElementById('modalBackdrop');
+        const form = document.getElementById('participanteForm');
+        const modalTitle = document.getElementById('modalTitle');
+
+        function openModal(p) {
+            form.reset();
+            if (p) {
+                modalTitle.textContent = 'Editar Participante';
+                form.querySelector('[name="id"]').value = p.id;
+                form.querySelector('[name="nombreCompleto"]').value = p.nombreCompleto;
+                form.querySelector('[name="apellidos"]').value = p.apellidos;
+                form.querySelector('[name="direccion"]').value = p.direccion;
+                form.querySelector('[name="username"]').value = p.username;
+                form.querySelector('[name="fechaNacimiento"]').value = p.fechaNacimiento;
+                form.querySelector('[name="estado"]').value = p.estado;
+                form.querySelector('[name="gradoAplica"]').value = p.gradoAplica ? p.gradoAplica.idGrado : '';
+                form.querySelector('[name="carreraAplica"]').value = p.carreraAplica ? p.carreraAplica.idCarrera : '';
+                form.querySelector('[name="cicloAcademico"]').value = p.cicloAcademico ? p.cicloAcademico.id : '';
+            } else {
+                modalTitle.textContent = 'Nuevo Participante';
+            }
+            modal.classList.add('show');
+            backdrop.classList.add('show');
+        }
+
+        function closeModal() {
+            modal.classList.remove('show');
+            backdrop.classList.remove('show');
+        }
+    </script>
+</main>
+</body>
+</html>

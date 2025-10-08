@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -71,5 +72,13 @@ public class AdmDocumentoRequeridoService {
             documentoRequeridoRepository.deleteById(id);
             return true;
         }).orElse(false);
+    }
+
+    /**
+     * Obtiene una lista de todos los documentos requeridos subidos en el sistema.
+     * @return Una lista de todas las entidades AdmDocumentoRequerido.
+     */
+    public List<AdmDocumentoRequerido> getAll() {
+        return documentoRequeridoRepository.findAll();
     }
 }

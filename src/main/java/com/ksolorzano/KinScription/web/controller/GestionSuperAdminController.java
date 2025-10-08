@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping("/admin/gestion")
-public class GestionAdminController {
+public class GestionSuperAdminController {
 
     /**
      * Muestra el menú principal de gestión de datos (CRUDs).

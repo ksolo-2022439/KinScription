@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/admin_layout}">
+<head>
+    <title>Gestión de Ciclos Académicos</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <a th:href="@{/admin/gestion}" class="back-link">&larr; Volver al Menú de Gestión</a>
+    <header class.="admin-header">
+        <h1>Gestión de Ciclos Académicos</h1>
+        <p>Crear, editar y eliminar los ciclos de admisión.</p>
+    </header>
+
+    <div class="controls-bar">
+        <button class="btn-primary" onclick="openModal(null)">＋ Nuevo Ciclo</button>
+    </div>
+
+    <div th:if="${successMessage}" class="flash-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="flash-error" th:text="${errorMessage}"></div>
+
+    <div class="admin-card">
+        <table class="data-table">
+            <thead>
+            <tr>
+                <th>ID</th><th>Nombre</th><th>Fecha Inicio</th><th>Fecha Fin</th><th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="c : ${ciclos}">
+                <td th:text="${c.id}"></td>
+                <td th:text="${c.nombre}"></td>
+                <td th:text="${#temporals.format(c.fechaInicio, 'dd/MM/yyyy')}"></td>
+                <td th:text="${#temporals.format(c.fechaFin, 'dd/MM/yyyy')}"></td>
+                <td class="action-buttons">
+                    <button class="btn-secondary" th:onclick="openModal([[${c}]])">Editar</button>
+                    <form th:action="@{/admin/gestion/ciclos/eliminar/{id}(id=${c.id})}" method="post" onsubmit="return confirm('¿Estás seguro de que quieres eliminar este ciclo?');" style="display: inline;">
+                        <button type="submit" class="btn-danger">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="crudModal" class="modal" th:classappend="${showModal} ? 'show' : ''">
+        <div class="modal-content">
+            <header class="modal-header">
+                <h3 id="modalTitle">Nuevo Ciclo Académico</h3>
+                <span class="close-button" onclick="closeModal()">&times;</span>
+            </header>
+            <div class="modal-body">
+                <form id="cicloForm" th:action="@{/admin/gestion/ciclos/guardar}" th:object="${ciclo}" method="post">
+                    <input type="hidden" th:field="*{id}" />
+
+                    <div class="form-group">
+                        <label for="nombre">Nombre del Ciclo</label>
+                        <input type="text" id="nombre" th:field="*{nombre}" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="fechaInicio">Fecha de Inicio</label>
+                        <input type="date" id="fechaInicio" th:field="*{fechaInicio}" class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="fechaFin">Fecha de Fin</label>
+                        <input type="date" id="fechaFin" th:field="*{fechaFin}" class="form-control">
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn-secondary" onclick="closeModal()">Cancelar</button>
+                        <button type="submit" class="btn-primary">Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div id="modalBackdrop" class="modal-backdrop" th:classappend="${showModal} ? 'show' : ''" onclick="closeModal()"></div>
+
+    <script th:inline="javascript">
+        const modal = document.getElementById('crudModal');
+        const backdrop = document.getElementById('modalBackdrop');
+        const form = document.getElementById('cicloForm');
+        const modalTitle = document.getElementById('modalTitle');
+
+        function openModal(ciclo) {
+            form.reset();
+            if (ciclo) {
+                modalTitle.textContent = 'Editar Ciclo Académico';
+                form.querySelector('[name="id"]').value = ciclo.id;
+                form.querySelector('[name="nombre"]').value = ciclo.nombre;
+                form.querySelector('[name="fechaInicio"]').value = ciclo.fechaInicio;
+                form.querySelector('[name="fechaFin"]').value = ciclo.fechaFin;
+            } else {
+                modalTitle.textContent = 'Nuevo Ciclo Académico';
+            }
+            modal.classList.add('show');
+            backdrop.classList.add('show');
+        }
+
+        function closeModal() {
+            modal.classList.remove('show');
+            backdrop.classList.remove('show');
+        }
+    </script>
+</main>
+</body>
+</html>
