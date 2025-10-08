@@ -330,25 +330,27 @@ Registro de Participante
 <!-- Aquí se pueden agregar capturas de pantalla del sistema -->
 
 ### Dashboard del Participante
-*Espacio para captura del dashboard con barra de progreso*
+![Dashboard del Participante](screenshots/dashboardparticipante.png)
 
 ### Proceso de Examen
-*Espacio para captura del formulario de examen*
+![Dashboard Examen](screenshots/dashboardexamen.png)
 
 ### Gestión de Papelería
-*Espacio para captura del sistema de carga de documentos*
+![Papeleria](screenshots/papeleria.png)
 
 ### Panel Administrativo
-*Espacio para captura del dashboard administrativo*
+![Panel Administrativo](screenshots/admin.png)
+
+![Panel Administrativo](screenshots/dashboardgestion.png)
 
 ### Gestión de Alumnos
-*Espacio para captura del CRUD de alumnos*
+![Gestión de Alumnos](screenshots/gestionalumnos.png)
 
 ### Sistema de Notas
-*Espacio para captura del módulo de calificaciones*
+![Sistema de Notas](screenshots/gestionnotas.png)
 
 ### Asignación de Profesores
-*Espacio para captura del sistema de asignaciones*
+![Asignación de Profesores](screenshots/asignaciones.png)
 
 ---
 
@@ -372,7 +374,7 @@ Este proyecto es de código privado. Todos los derechos reservados.
 
 ## 👨‍💻 Autor
 
-**ksolo-2022439**
+- **GitHub:** [@ksolo-2022439](https://github.com/ksolo-2022439)
 
 ---
 
