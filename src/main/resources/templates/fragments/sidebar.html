@@ -66,6 +66,16 @@
             </a>
         </div>
     </nav>
+
+    <div class="sidebar-footer">
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="nav-item">
+                <span class="nav-icon">🚪</span>
+                <span>Cerrar Sesión</span>
+            </button>
+        </form>
+    </div>
+
 </aside>
 
 </body>

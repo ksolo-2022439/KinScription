@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 
-@Component
+// @Component
 public class DataSeeder implements CommandLineRunner {
 
     private final AdmParticipanteRepository participanteRepository;

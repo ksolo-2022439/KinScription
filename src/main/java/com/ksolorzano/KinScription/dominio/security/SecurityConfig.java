@@ -22,6 +22,9 @@ public class SecurityConfig {
     @Autowired
     private GestionUserDetailsService gestionUserDetailsService;
 
+    @Autowired
+    private CustomLogoutSuccessHandler customLogoutSuccessHandler;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         // DEV-ONLY: Este encoder está deprecado, no utilizar en producción.
@@ -34,6 +37,7 @@ public class SecurityConfig {
         http
                 .securityMatcher("/gestion/**")
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/gestion/login").permitAll()
                         .anyRequest().hasAnyRole("COORDINADOR", "PROFESOR")
                 )
                 .formLogin(form -> form
@@ -44,8 +48,8 @@ public class SecurityConfig {
                         .permitAll()
                 )
                 .logout(logout -> logout
-                        .logoutUrl("/gestion/logout")
-                        .logoutSuccessUrl("/gestion/login?logout=true")
+                        .logoutUrl("/logout")
+                        .logoutSuccessHandler(customLogoutSuccessHandler)
                 )
                 .authenticationProvider(gestionAuthenticationProvider());
 
@@ -73,7 +77,7 @@ public class SecurityConfig {
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login?logout=true")
+                        .logoutSuccessHandler(customLogoutSuccessHandler)
                 )
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
                 .authenticationProvider(defaultAuthenticationProvider());

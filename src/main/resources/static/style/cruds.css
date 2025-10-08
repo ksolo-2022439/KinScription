@@ -238,3 +238,28 @@ body {
     color: var(--text-secondary-color);
     opacity: 0.7;
 }
+
+.sidebar-footer {
+    padding-top: 1rem;
+    margin-top: auto;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* El formulario no debe tener márgenes */
+.sidebar-footer form {
+    margin: 0;
+}
+
+.sidebar-footer .nav-item {
+    width: 100%;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-family: inherit;
+    text-align: left;
+    color: inherit;
+}
+
+.sidebar-footer .nav-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
