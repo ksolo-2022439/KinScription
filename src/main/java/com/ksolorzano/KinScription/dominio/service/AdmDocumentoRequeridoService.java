@@ -67,6 +67,12 @@ public class AdmDocumentoRequeridoService {
         participanteService.save(participante);
     }
 
+    /**
+     * Procesa la aprobación de la papelería.
+     * Esta acción es discrecional del administrador. Marca todos los documentos
+     * subidos como 'APROBADO' y avanza al participante al siguiente estado.
+     * @param participanteId El ID del participante a aprobar.
+     */
     @Transactional
     public void aprobarPapeleria(int participanteId) {
         AdmParticipante participante = participanteService.getById(participanteId)
@@ -77,15 +83,6 @@ public class AdmDocumentoRequeridoService {
         }
 
         List<AdmDocumentoRequerido> documentosSubidos = documentoRepository.findByParticipante(participante);
-        Map<String, AdmDocumentoRequerido> mapaSubidos = documentosSubidos.stream()
-                .collect(Collectors.toMap(AdmDocumentoRequerido::getNombreDocumento, doc -> doc));
-
-        for(String docRequerido : DOCUMENTOS_REQUERIDOS){
-            if(!mapaSubidos.containsKey(docRequerido)){
-                throw new IllegalStateException("No se puede aprobar: falta el documento '" + docRequerido + "'.");
-            }
-        }
-
         documentosSubidos.forEach(doc -> {
             doc.setEstadoRevision("APROBADO");
             doc.setComentarioRechazo(null);

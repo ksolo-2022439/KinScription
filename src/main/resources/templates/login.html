@@ -21,6 +21,8 @@
             </div>
 
             <form th:action="@{/perform_login}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
                 <div class="input-group">
                     <label for="username">Usuario</label>
                     <input type="text" id="username" name="username" placeholder="Ingrese su usuario" required>

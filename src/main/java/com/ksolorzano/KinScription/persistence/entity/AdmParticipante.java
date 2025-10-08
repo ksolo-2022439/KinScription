@@ -21,12 +21,12 @@ public class AdmParticipante {
     private Integer id;
 
     @NotEmpty(message = "El nombre de usuario no puede estar vacío.")
-    @Size(min = 5, max = 50, message = "El nombre de usuario debe tener entre 5 y 50 caracteres.")
+    @Size(min = 5, max = 50)
     @Column(name = "username", nullable = false, unique = true, length = 50)
     private String username;
 
     @NotEmpty(message = "La contraseña no puede estar vacía.")
-    @Size(min = 8, message = "La contraseña debe tener al menos 8 caracteres.")
+    @Size(min = 8)
     @Column(name = "password", nullable = false, length = 255)
     private String password;
 

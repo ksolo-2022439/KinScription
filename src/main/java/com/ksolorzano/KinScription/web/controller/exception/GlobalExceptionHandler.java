@@ -1,4 +1,4 @@
-package com.ksolorzano.KinScription.web.controller;
+package com.ksolorzano.KinScription.web.controller.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.ControllerAdvice;

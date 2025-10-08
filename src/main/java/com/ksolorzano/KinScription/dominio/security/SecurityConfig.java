@@ -32,60 +32,6 @@ public class SecurityConfig {
     }
 
     @Bean
-    @Order(1)
-    public SecurityFilterChain gestionSecurityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .securityMatcher("/gestion/**")
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/gestion/login").permitAll()
-                        .anyRequest().hasAnyRole("COORDINADOR", "PROFESOR")
-                )
-                .formLogin(form -> form
-                        .loginPage("/gestion/login")
-                        .loginProcessingUrl("/gestion/perform_login")
-                        .defaultSuccessUrl("/gestion/dashboard", true)
-                        .failureUrl("/gestion/login?error=true")
-                        .permitAll()
-                )
-                .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessHandler(customLogoutSuccessHandler)
-                )
-                .authenticationProvider(gestionAuthenticationProvider());
-
-        return http.build();
-    }
-
-    @Bean
-    @Order(2)
-    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/css/**", "/style/**", "/js/**", "/contracts/**").permitAll()
-                        .requestMatchers("/login", "/gestion/login").permitAll()
-                        .requestMatchers("/admin/gestion/**").hasRole("SUPER_ADMIN")
-                        .requestMatchers("/portal/**").hasRole("PARTICIPANTE")
-                        .requestMatchers("/admin/**").hasAnyRole("ADMIN_INSCRIPCION", "DIRECTOR_ADMIN", "ORIENTACION", "SECRETARIA", "SUPER_ADMIN")
-                        .anyRequest().authenticated()
-                )
-                .formLogin(form -> form
-                        .loginPage("/login")
-                        .loginProcessingUrl("/perform_login")
-                        .defaultSuccessUrl("/", true)
-                        .failureUrl("/login?error=true")
-                        .permitAll()
-                )
-                .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessHandler(customLogoutSuccessHandler)
-                )
-                .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
-                .authenticationProvider(defaultAuthenticationProvider());
-
-        return http.build();
-    }
-
-    @Bean
     public DaoAuthenticationProvider defaultAuthenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setUserDetailsService(customUserDetailsService);
@@ -99,5 +45,57 @@ public class SecurityConfig {
         provider.setUserDetailsService(gestionUserDetailsService);
         provider.setPasswordEncoder(passwordEncoder());
         return provider;
+    }
+
+    @Bean
+    @Order(1)
+    public SecurityFilterChain gestionSecurityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .securityMatcher("/gestion/**")
+                .authenticationProvider(gestionAuthenticationProvider()) // <-- Asignamos el proveedor específico
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/gestion/login", "/gestion/perform_login").permitAll()
+                        .anyRequest().hasAnyRole("COORDINADOR", "PROFESOR")
+                )
+                .formLogin(form -> form
+                        .loginPage("/gestion/login")
+                        .loginProcessingUrl("/gestion/perform_login")
+                        .defaultSuccessUrl("/gestion/dashboard", true)
+                        .failureUrl("/gestion/login?error=true")
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessHandler(customLogoutSuccessHandler)
+                );
+
+        return http.build();
+    }
+
+    @Bean
+    @Order(2)
+    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .authenticationProvider(defaultAuthenticationProvider()) // <-- Asignamos el proveedor específico
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/css/**", "/style/**", "/js/**", "/contracts/**", "/vendor/**").permitAll()
+                        .requestMatchers("/login", "/gestion/login").permitAll()
+                        .requestMatchers("/admin/gestion/**").hasRole("SUPER_ADMIN")
+                        .requestMatchers("/portal/**").hasRole("PARTICIPANTE")
+                        .requestMatchers("/admin/**").hasAnyRole("ADMIN_INSCRIPCION", "DIRECTOR_ADMIN", "ORIENTACION", "SECRETARIA", "SUPER_ADMIN")
+                        .anyRequest().authenticated()
+                )
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .loginProcessingUrl("/perform_login")
+                        .defaultSuccessUrl("/", true)
+                        .failureUrl("/login?error=true")
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessHandler(customLogoutSuccessHandler)
+                )
+                .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin));
+
+        return http.build();
     }
 }

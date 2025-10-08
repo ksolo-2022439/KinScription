@@ -33,22 +33,31 @@
                 <tbody>
                 <tr th:each="e : ${estudios}">
                     <td th:text="${e.id}"></td>
-                    <td th:text="${e.participante.nombreCompleto}"></td>
+                    <td th:text="${e.participante?.nombreCompleto}"></td>
                     <td th:text="${e.datosTutorNombre} + ' ' + ${e.datosTutorApellido}"></td>
                     <td th:text="${#numbers.formatDecimal(e.montoInscripcion, 1, 'COMMA', 2, 'POINT')}"></td>
                     <td th:text="${#numbers.formatDecimal(e.montoMensualidad, 1, 'COMMA', 2, 'POINT')}"></td>
                     <td>
-                        <span th:text="${e.aprobadoDirector ? 'Sí' : 'No'}"
-                              th:classappend="${e.aprobadoDirector ? 'badge success' : 'badge pending'}"></span>
+                        <span th:text="${e.aprobadoDirector ? 'Sí' : 'No'}" th:classappend="${e.aprobadoDirector ? 'badge success' : 'badge pending'}"></span>
                     </td>
                     <td>
-                        <span th:text="${e.aprobadoOrientacion ? 'Sí' : 'No'}"
-                              th:classappend="${e.aprobadoOrientacion ? 'badge success' : 'badge pending'}"></span>
+                        <span th:text="${e.aprobadoOrientacion ? 'Sí' : 'No'}" th:classappend="${e.aprobadoOrientacion ? 'badge success' : 'badge pending'}"></span>
                     </td>
                     <td class="action-buttons">
-                        <button class="btn-secondary" th:onclick="openModal([[${e}]])">Editar</button>
-                        <form th:action="@{/admin/gestion/estudios/eliminar/{id}(id=${e.id})}" method="post"
-                              onsubmit="return confirm('¿Estás seguro?');" style="display: inline;">
+                        <button class="btn-secondary"
+                                th:onclick="openModal(
+                                    [[${e.id}]],
+                                    [[${e.participante?.id}]],
+                                    [[${e.datosTutorNombre}]],
+                                    [[${e.datosTutorApellido}]],
+                                    [[${e.datosTutorTelefono}]],
+                                    [[${e.datosTutorDireccion}]],
+                                    [[${e.montoInscripcion}]],
+                                    [[${e.montoMensualidad}]],
+                                    [[${e.aprobadoDirector}]],
+                                    [[${e.aprobadoOrientacion}]]
+                                )">Editar</button>
+                        <form th:action="@{/admin/gestion/estudios/eliminar/{id}(id=${e.id})}" method="post" onsubmit="return confirm('¿Estás seguro?');" style="display: inline;">
                             <button type="submit" class="btn-danger">Eliminar</button>
                         </form>
                     </td>
@@ -65,10 +74,9 @@
                 <span class="close-button" onclick="closeModal()">&times;</span>
             </header>
             <div class="modal-body">
-                <form id="estudioForm" th:action="@{/admin/gestion/estudios/guardar}" th:object="${estudio}"
-                      method="post">
-                    <input type="hidden" th:field="*{id}"/>
-                    <input type="hidden" th:field="*{participante}"/>
+                <form id="estudioForm" th:action="@{/admin/gestion/estudios/guardar}" th:object="${estudio}" method="post">
+                    <input type="hidden" th:field="*{id}" />
+                    <input type="hidden" th:field="*{participante}" />
 
                     <div class="form-group">
                         <label>ID Participante:</label>
@@ -81,29 +89,24 @@
                     </div>
                     <div class="form-group">
                         <label for="datosTutorApellido">Apellido del Tutor</label>
-                        <input type="text" id="datosTutorApellido" th:field="*{datosTutorApellido}"
-                               class="form-control">
+                        <input type="text" id="datosTutorApellido" th:field="*{datosTutorApellido}" class="form-control">
                     </div>
                     <div class="form-group">
                         <label for="datosTutorTelefono">Teléfono del Tutor</label>
-                        <input type="text" id="datosTutorTelefono" th:field="*{datosTutorTelefono}"
-                               class="form-control">
+                        <input type="text" id="datosTutorTelefono" th:field="*{datosTutorTelefono}" class="form-control">
                     </div>
                     <div class="form-group">
                         <label for="datosTutorDireccion">Dirección del Tutor</label>
-                        <input type="text" id="datosTutorDireccion" th:field="*{datosTutorDireccion}"
-                               class="form-control">
+                        <input type="text" id="datosTutorDireccion" th:field="*{datosTutorDireccion}" class="form-control">
                     </div>
                     <hr>
                     <div class="form-group">
                         <label for="montoInscripcion">Monto Inscripción (Q)</label>
-                        <input type="number" id="montoInscripcion" th:field="*{montoInscripcion}" class="form-control"
-                               step="0.01">
+                        <input type="number" id="montoInscripcion" th:field="*{montoInscripcion}" class="form-control" step="0.01">
                     </div>
                     <div class="form-group">
                         <label for="montoMensualidad">Monto Mensualidad (Q)</label>
-                        <input type="number" id="montoMensualidad" th:field="*{montoMensualidad}" class="form-control"
-                               step="0.01">
+                        <input type="number" id="montoMensualidad" th:field="*{montoMensualidad}" class="form-control" step="0.01">
                     </div>
                     <hr>
                     <div class="form-group-checkbox">
@@ -130,23 +133,23 @@
         const backdrop = document.getElementById('modalBackdrop');
         const form = document.getElementById('estudioForm');
 
-        function openModal(estudio) {
+        function openModal(id, participanteId, tutorNombre, tutorApellido, tutorTelefono, tutorDireccion, montoInscripcion, montoMensualidad, aprobadoDirector, aprobadoOrientacion) {
             form.reset();
-            if (estudio) {
-                form.querySelector('[name="id"]').value = estudio.id;
-                form.querySelector('[name="participante"]').value = estudio.participante.id;
-                document.getElementById('modalParticipanteId').textContent = estudio.participante.id;
+            if (id) { // Modo Editar
+                form.querySelector('[name="id"]').value = id;
+                form.querySelector('[name="participante"]').value = participanteId;
+                document.getElementById('modalParticipanteId').textContent = participanteId;
 
-                form.querySelector('[name="datosTutorNombre"]').value = estudio.datosTutorNombre;
-                form.querySelector('[name="datosTutorApellido"]').value = estudio.datosTutorApellido;
-                form.querySelector('[name="datosTutorTelefono"]').value = estudio.datosTutorTelefono;
-                form.querySelector('[name="datosTutorDireccion"]').value = estudio.datosTutorDireccion;
+                form.querySelector('[name="datosTutorNombre"]').value = tutorNombre;
+                form.querySelector('[name="datosTutorApellido"]').value = tutorApellido;
+                form.querySelector('[name="datosTutorTelefono"]').value = tutorTelefono;
+                form.querySelector('[name="datosTutorDireccion"]').value = tutorDireccion;
 
-                form.querySelector('[name="montoInscripcion"]').value = estudio.montoInscripcion;
-                form.querySelector('[name="montoMensualidad"]').value = estudio.montoMensualidad;
+                form.querySelector('[name="montoInscripcion"]').value = montoInscripcion;
+                form.querySelector('[name="montoMensualidad"]').value = montoMensualidad;
 
-                form.querySelector('[name="aprobadoDirector"]').checked = estudio.aprobadoDirector;
-                form.querySelector('[name="aprobadoOrientacion"]').checked = estudio.aprobadoOrientacion;
+                form.querySelector('[name="aprobadoDirector"]').checked = aprobadoDirector;
+                form.querySelector('[name="aprobadoOrientacion"]').checked = aprobadoOrientacion;
             }
             modal.classList.add('show');
             backdrop.classList.add('show');

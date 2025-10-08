@@ -30,34 +30,42 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return administradorRepository.findByEmail(username)
-                .map(admin -> {
-                    List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + admin.getRol().name()));
 
-                    String rolLegible = formatRole(admin.getRol().name());
+        // --- BÚSQUEDA EXPLÍCITA ---
 
-                    return new CustomUserDetails(
-                            admin.getEmail(),
-                            admin.getPassword(),
-                            authorities,
-                            admin.getNombreCompleto(),
-                            rolLegible
-                    );
-                })
-                .or(() -> participanteRepository.findByUsername(username)
-                        .map(participante -> {
-                            List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_PARTICIPANTE"));
+        // Intento 1: ¿Es un administrador de inscripción?
+        Optional<Administrador> adminOpt = administradorRepository.findByEmail(username);
+        if (adminOpt.isPresent()) {
+            Administrador admin = adminOpt.get();
+            List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + admin.getRol().name()));
+            String rolLegible = formatRole(admin.getRol().name());
 
-                            return new CustomUserDetails(
-                                    participante.getUsername(),
-                                    participante.getPassword(),
-                                    authorities,
-                                    participante.getNombreCompleto() + " " + participante.getApellidos(), // <-- Nombre completo
-                                    "Participante"
-                            );
-                        }))
-                // 3. Si no se encuentra, lanzar excepción
-                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + username));
+            return new CustomUserDetails(
+                    admin.getEmail(),
+                    admin.getPassword(),
+                    authorities,
+                    admin.getNombreCompleto(),
+                    rolLegible
+            );
+        }
+
+        // Intento 2: ¿Es un participante?
+        Optional<AdmParticipante> participanteOpt = participanteRepository.findByUsername(username);
+        if (participanteOpt.isPresent()) {
+            AdmParticipante participante = participanteOpt.get();
+            List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_PARTICIPANTE"));
+
+            return new CustomUserDetails(
+                    participante.getUsername(),
+                    participante.getPassword(),
+                    authorities,
+                    participante.getNombreCompleto() + " " + participante.getApellidos(),
+                    "Participante"
+            );
+        }
+
+        // Si después de buscar en AMBAS tablas no se encuentra, entonces lanzamos la excepción.
+        throw new UsernameNotFoundException("Usuario no encontrado en el portal de admisión: " + username);
     }
 
     private String formatRole(String role) {

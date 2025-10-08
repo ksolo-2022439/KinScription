@@ -30,7 +30,7 @@
             <tbody>
             <tr th:each="doc : ${documentos}">
                 <td th:text="${doc.id}"></td>
-                <td th:text="${doc.participante.nombreCompleto} + ' ' + ${doc.participante.apellidos}"></td>
+                <td th:text="${doc.participante?.nombreCompleto} + ' ' + ${doc.participante?.apellidos}"></td>
                 <td th:text="${doc.nombreDocumento}"></td>
                 <td th:text="${doc.urlArchivo}"></td>
                 <td>
@@ -38,7 +38,16 @@
                            th:classappend="${doc.estadoRevision == 'APROBADO'} ? 'badge success' : 'badge pending'"></span>
                 </td>
                 <td class="action-buttons">
-                    <button class="btn-secondary" th:onclick="openModal([[${doc}]])">Editar</button>
+                    <button class="btn-secondary"
+                            th:onclick="openModal(
+                                [[${doc.id}]],
+                                [[${doc.participante?.id}]],
+                                [[${doc.participante?.nombreCompleto}]],
+                                [[${doc.participante?.apellidos}]],
+                                [[${doc.nombreDocumento}]],
+                                [[${doc.urlArchivo}]],
+                                [[${doc.estadoRevision}]]
+                            )">Editar</button>
                     <form th:action="@{/admin/gestion/documentos/eliminar/{id}(id=${doc.id})}" method="post"
                           onsubmit="return confirm('¿Estás seguro de que quieres eliminar este registro?');"
                           style="display: inline;">
@@ -102,15 +111,15 @@
         const backdrop = document.getElementById('modalBackdrop');
         const form = document.getElementById('documentoForm');
 
-        function openModal(doc) {
+        function openModal(id, participanteId, participanteNombre, participanteApellidos, nombreDocumento, urlArchivo, estadoRevision) {
             form.reset();
-            if (doc) {
-                form.querySelector('[name="id"]').value = doc.id;
-                form.querySelector('[name="participante"]').value = doc.participante.id;
-                document.getElementById('modalParticipanteNombre').textContent = doc.participante.nombreCompleto + ' ' + doc.participante.apellidos;
-                form.querySelector('[name="nombreDocumento"]').value = doc.nombreDocumento;
-                form.querySelector('[name="urlArchivo"]').value = doc.urlArchivo;
-                form.querySelector('[name="estadoRevision"]').value = doc.estadoRevision;
+            if (id) { // Modo Editar
+                form.querySelector('[name="id"]').value = id;
+                form.querySelector('[name="participante"]').value = participanteId;
+                document.getElementById('modalParticipanteNombre').textContent = participanteNombre + ' ' + participanteApellidos;
+                form.querySelector('[name="nombreDocumento"]').value = nombreDocumento;
+                form.querySelector('[name="urlArchivo"]').value = urlArchivo;
+                form.querySelector('[name="estadoRevision"]').value = estadoRevision;
             }
             modal.classList.add('show');
             backdrop.classList.add('show');

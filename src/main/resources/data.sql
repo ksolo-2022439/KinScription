@@ -143,55 +143,36 @@ INSERT IGNORE INTO adm_ciclos_academicos (id, nombre, fecha_inicio, fecha_fin) V
 -- =============================================================
 -- INSERCIÓN DE PARTICIPANTES (ASPIRANTES)
 -- =============================================================
--- #1 Pendiente de Examen
-INSERT IGNORE INTO adm_participantes (username, password, nombre_completo, apellidos, fecha_nacimiento, direccion, estado, id_ciclo_academico, id_grado_aplica) VALUES
-('aspirante01', 'password123', 'Juan Carlos', 'Pérez Gómez', '2008-05-10', 'Zona 7, Ciudad de Guatemala', 'PENDIENTE_EXAMEN', 1, 4);
+INSERT IGNORE INTO adm_participantes (username, password, nombre_completo, apellidos, fecha_nacimiento, direccion, estado, id_ciclo_academico, id_grado_aplica, activo) VALUES
+('aspirante01', 'password123', 'Juan Carlos', 'Pérez Gómez', '2008-05-10', 'Zona 7, Ciudad de Guatemala', 'PENDIENTE_EXAMEN', 1, 4, TRUE);
 
--- #2 Examen Realizado (listo para calificar)
-INSERT IGNORE INTO adm_participantes (username, password, nombre_completo, apellidos, fecha_nacimiento, direccion, estado, id_ciclo_academico, id_grado_aplica, id_carrera_aplica) VALUES
-('aspirante02', 'password123', 'Ana Sofía', 'Martínez López', '2008-03-15', 'Zona 11, Mixco', 'EXAMEN_REALIZADO', 1, 4, 1);
+INSERT IGNORE INTO adm_participantes (username, password, nombre_completo, apellidos, fecha_nacimiento, direccion, estado, id_ciclo_academico, id_grado_aplica, id_carrera_aplica, activo) VALUES
+('aspirante02', 'password123', 'Ana Sofía', 'Martínez López', '2008-03-15', 'Zona 11, Mixco', 'PENDIENTE_EXAMEN', 1, 4, 1, TRUE);
 
--- #3 Examen Admitido (listo para llenar socioeconómico)
-INSERT IGNORE INTO adm_participantes (username, password, nombre_completo, apellidos, fecha_nacimiento, direccion, estado, nota_examen, id_ciclo_academico, id_grado_aplica) VALUES
-('aspirante03', 'password123', 'Luis Fernando', 'García Ramírez', '2009-01-20', 'Zona 1, Villa Nueva', 'ADMITIDO_EXAMEN', 85.50, 1, 1);
+INSERT IGNORE INTO adm_participantes (username, password, nombre_completo, apellidos, fecha_nacimiento, direccion, estado, nota_examen, id_ciclo_academico, id_grado_aplica, activo) VALUES
+('aspirante03', 'password123', 'Luis Fernando', 'García Ramírez', '2009-01-20', 'Zona 1, Villa Nueva', 'PENDIENTE_EXAMEN', 85.50, 1, 1, TRUE);
 
--- #4 Socioeconómico Enviado (listo para revisar por Director)
-INSERT IGNORE INTO adm_participantes (username, password, nombre_completo, apellidos, fecha_nacimiento, direccion, estado, nota_examen, id_ciclo_academico, id_grado_aplica, id_carrera_aplica) VALUES
-('aspirante04', 'password123', 'María José', 'Hernández Díaz', '2008-11-30', 'Zona 10, Guatemala', 'SOCIOECONOMICO_ENVIADO', 92.00, 1, 4, 5);
-INSERT IGNORE INTO adm_estudios_socioeconomicos (id_participante, datos_tutor_nombre, datos_tutor_apellido, datos_tutor_telefono, datos_tutor_direccion) VALUES
-(4, 'Jorge', 'Hernández', '5555-1111', 'Misma dirección que el aspirante');
+INSERT IGNORE INTO adm_participantes (username, password, nombre_completo, apellidos, fecha_nacimiento, direccion, estado, nota_examen, id_ciclo_academico, id_grado_aplica, id_carrera_aplica, activo) VALUES
+('aspirante04', 'password123', 'María José', 'Hernández Díaz', '2008-11-30', 'Zona 10, Guatemala', 'PENDIENTE_EXAMEN', 92.00, 1, 4, 5, TRUE);
 
--- #5 Admitido por Director (listo para revisar por Orientación)
-INSERT IGNORE INTO adm_participantes (username, password, nombre_completo, apellidos, fecha_nacimiento, direccion, estado, nota_examen, id_ciclo_academico, id_grado_aplica, id_carrera_aplica) VALUES
-('aspirante05', 'password123', 'Carlos David', 'Sánchez Torres', '2007-07-07', 'Carretera a El Salvador', 'ADMITIDO_SOCIOECONOMICO', 78.00, 1, 4, 3);
-INSERT IGNORE INTO adm_estudios_socioeconomicos (id_participante, datos_tutor_nombre, datos_tutor_apellido, datos_tutor_telefono, datos_tutor_direccion, monto_inscripcion, monto_mensualidad, aprobado_director) VALUES
-(5, 'Elena', 'Torres', '5555-2222', 'Misma dirección', 500.00, 850.00, TRUE);
+INSERT IGNORE INTO adm_participantes (username, password, nombre_completo, apellidos, fecha_nacimiento, direccion, estado, nota_examen, id_ciclo_academico, id_grado_aplica, id_carrera_aplica, activo) VALUES
+('aspirante05', 'password123', 'Carlos David', 'Sánchez Torres', '2007-07-07', 'Carretera a El Salvador', 'PENDIENTE_EXAMEN', 78.00, 1, 4, 3, TRUE);
 
--- #6 Formulario Admitido (listo para subir papelería)
-INSERT IGNORE INTO adm_participantes (username, password, nombre_completo, apellidos, fecha_nacimiento, direccion, estado, nota_examen, id_ciclo_academico, id_grado_aplica, id_tutor_generado) VALUES
-('aspirante06', 'password123', 'Laura Valentina', 'González Castillo', '2009-02-14', 'Zona 16, Guatemala', 'ADMITIDO_FORMULARIO', 95.00, 1, 1, 1);
-INSERT IGNORE INTO adm_estudios_socioeconomicos (id_participante, datos_tutor_nombre, datos_tutor_apellido, datos_tutor_telefono, datos_tutor_direccion, monto_inscripcion, monto_mensualidad, aprobado_director, aprobado_orientacion) VALUES
-(6, 'Carlos', 'González', '55123456', '4a Calle 12-34 Zona 5', 600.00, 900.00, TRUE, TRUE);
+INSERT IGNORE INTO adm_participantes (username, password, nombre_completo, apellidos, fecha_nacimiento, direccion, estado, nota_examen, id_ciclo_academico, id_grado_aplica, id_tutor_generado, activo) VALUES
+('aspirante06', 'password123', 'Laura Valentina', 'González Castillo', '2009-02-14', 'Zona 16, Guatemala', 'PENDIENTE_EXAMEN', 95.00, 1, 1, 1, TRUE);
 
--- #7 Papelería Enviada (lista para revisar por Secretaría)
-INSERT IGNORE INTO adm_participantes (username, password, nombre_completo, apellidos, fecha_nacimiento, direccion, estado, nota_examen, id_ciclo_academico, id_grado_aplica, id_tutor_generado) VALUES
-('aspirante07', 'password123', 'Diego Alejandro', 'Morales Reyes', '2008-09-01', 'Zona 2, Guatemala', 'PAPELERIA_ENVIADA', 88.00, 1, 4, 2);
-INSERT IGNORE INTO adm_documentos_requeridos (id_participante, nombre_documento, url_archivo, estado_revision) VALUES
-(7, 'Acta de Nacimiento', 'placeholder.pdf', 'PENDIENTE');
+INSERT IGNORE INTO adm_participantes (username, password, nombre_completo, apellidos, fecha_nacimiento, direccion, estado, nota_examen, id_ciclo_academico, id_grado_aplica, id_tutor_generado, activo) VALUES
+('aspirante07', 'password123', 'Diego Alejandro', 'Morales Reyes', '2008-09-01', 'Zona 2, Guatemala', 'PENDIENTE_EXAMEN', 88.00, 1, 4, 2, TRUE);
 
--- #8 Papelería Admitida (listo para subir contrato)
-INSERT IGNORE INTO adm_participantes (username, password, nombre_completo, apellidos, fecha_nacimiento, direccion, estado, nota_examen, id_ciclo_academico, id_grado_aplica, id_carrera_aplica, id_tutor_generado) VALUES
-('aspirante08', 'password123', 'Sofía Isabel', 'Guzmán Ortiz', '2007-12-25', 'Zona 15, Guatemala', 'ADMITIDO_PAPELERIA', 91.00, 1, 5, 6, 3);
+INSERT IGNORE INTO adm_participantes (username, password, nombre_completo, apellidos, fecha_nacimiento, direccion, estado, nota_examen, id_ciclo_academico, id_grado_aplica, id_carrera_aplica, id_tutor_generado, activo) VALUES
+('aspirante08', 'password123', 'Sofía Isabel', 'Guzmán Ortiz', '2007-12-25', 'Zona 15, Guatemala', 'PENDIENTE_EXAMEN', 91.00, 1, 5, 6, 3, TRUE);
 
--- #9 Contrato Enviado (listo para revisión final)
-INSERT IGNORE INTO adm_participantes (username, password, nombre_completo, apellidos, fecha_nacimiento, direccion, estado, nota_examen, id_ciclo_academico, id_grado_aplica, id_carrera_aplica, id_tutor_generado) VALUES
-('aspirante09', 'password123', 'Javier Andrés', 'Valdez Salazar', '2008-08-18', 'Zona 9, Guatemala', 'CONTRATO_ENVIADO', 75.00, 1, 4, 4, 4);
-INSERT IGNORE INTO adm_contratos (id_participante, nombre_abogado, colegiado_abogado, url_pdf_contrato, aprobado) VALUES
-(9, 'Lic. Ricardo Méndez', '98765', 'placeholder.pdf', FALSE);
+INSERT IGNORE INTO adm_participantes (username, password, nombre_completo, apellidos, fecha_nacimiento, direccion, estado, nota_examen, id_ciclo_academico, id_grado_aplica, id_carrera_aplica, id_tutor_generado, activo) VALUES
+('aspirante09', 'password123', 'Javier Andrés', 'Valdez Salazar', '2008-08-18', 'Zona 9, Guatemala', 'PENDIENTE_EXAMEN', 75.00, 1, 4, 4, 4, TRUE);
 
 -- #10 Participante Desaprobado
-INSERT IGNORE INTO adm_participantes (username, password, nombre_completo, apellidos, fecha_nacimiento, direccion, estado, nota_examen, id_ciclo_academico, id_grado_aplica) VALUES
-('aspirante10', 'password123', 'Lucía Fernanda', 'Castillo Mendoza', '2009-04-12', 'Zona 5, Guatemala', 'DESAPROBADO', 45.00, 1, 1);
+INSERT IGNORE INTO adm_participantes (username, password, nombre_completo, apellidos, fecha_nacimiento, direccion, estado, nota_examen, id_ciclo_academico, id_grado_aplica, activo) VALUES
+('aspirante10', 'password123', 'Lucía Fernanda', 'Castillo Mendoza', '2009-04-12', 'Zona 5, Guatemala', 'DESAPROBADO', 45.00, 1, 1, TRUE);
 
 -- =============================================================
 -- INSERCIÓN DE TUTORES
