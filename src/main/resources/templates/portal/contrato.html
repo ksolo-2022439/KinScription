@@ -11,6 +11,8 @@
         <p>Este es el último paso. Revisa, descarga y sube tu contrato firmado.</p>
     </header>
 
+    <div th:if="${errorMessage}" class="flash-error" th:text="${errorMessage}"></div>
+
     <div class="review-grid">
         <div class="admin-card">
             <h3>Paso 1: Descargar y Firmar Contrato</h3>
@@ -55,6 +57,7 @@
                 <div class="form-group">
                     <label for="file">Archivo del Contrato Firmado (PDF):</label>
                     <input type="file" id="file" name="file" class="form-control" required accept=".pdf">
+                    <small>Tamaño máximo permitido: 5MB.</small>
                 </div>
                 <button type="submit" class="btn-primary">Finalizar y Subir Contrato</button>
             </form>

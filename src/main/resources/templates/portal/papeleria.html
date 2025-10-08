@@ -12,7 +12,8 @@
     </header>
 
     <div th:if="${successMessage}" class="flash-success" th:text="${successMessage}"></div>
-
+    <div th:if="${errorMessage}" class="flash-error" th:text="${errorMessage}"></div>
+    
     <div class="review-grid">
         <div class="admin-card">
             <h3>Estado de Documentos</h3>
@@ -62,6 +63,7 @@
                 <div class="form-group">
                     <label for="file">2. Elige el archivo (PDF, JPG, PNG):</label>
                     <input type="file" id="file" name="file" class="form-control" required>
+                    <small>Tamaño máximo permitido: 5MB.</small>
                 </div>
                 <button type="submit" class="btn-primary">Subir Documento</button>
             </form>
