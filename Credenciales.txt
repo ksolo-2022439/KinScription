@@ -1,0 +1,19 @@
+CREDENCIALES
+
+Participante:
+aspirante01
+password123
+
+Administrador de Ejemplo:
+
+Administrador de Inscripciones:
+admin@kinal.edu.gt
+password123
+
+Super Admin:
+superadmin@kinal.edu.gt
+password123
+
+Coordinador:
+monica.salazar@kinscript.org
+coordinador123
