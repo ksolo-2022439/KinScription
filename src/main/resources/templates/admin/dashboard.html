@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       layout:decorate="~{admin/admin_layout}">
 <head>
     <title>Dashboard de Administración</title>
@@ -13,47 +14,52 @@
 
     <div class="dashboard-grid">
         <div class="dashboard-card"
-             th:classappend="${!#authorization.expression('hasRole(''ROLE_ADMIN_INSCRIPCION'')')} ? 'disabled' : ''">
+             th:classappend="${!#authorization.expression('hasRole(''ROLE_ADMIN_INSCRIPCION'') or hasRole(''ROLE_SUPER_ADMIN'')')} ? 'disabled' : ''">
             <a th:href="@{/admin/inscripcion/examenes}">
                 <h3>Revisar Exámenes</h3>
                 <p>Calificar las evaluaciones de los nuevos aspirantes.</p>
                 <span class="card-role-tag">Admin. Inscripción</span>
             </a>
         </div>
-
         <div class="dashboard-card"
-             th:classappend="${!#authorization.expression('hasRole(''ROLE_DIRECTOR_ADMIN'')')} ? 'disabled' : ''">
+             th:classappend="${!#authorization.expression('hasRole(''ROLE_DIRECTOR_ADMIN'') or hasRole(''ROLE_SUPER_ADMIN'')')} ? 'disabled' : ''">
             <a th:href="@{/admin/director/socioeconomico/revisar}">
                 <h3>Aprobar Solicitudes</h3>
                 <p>Revisar y aprobar los estudios socioeconómicos enviados.</p>
                 <span class="card-role-tag">Director Admin.</span>
             </a>
         </div>
-
         <div class="dashboard-card"
-             th:classappend="${!#authorization.expression('hasRole(''ROLE_ORIENTACION'')')} ? 'disabled' : ''">
+             th:classappend="${!#authorization.expression('hasRole(''ROLE_ORIENTACION'') or hasRole(''ROLE_SUPER_ADMIN'')')} ? 'disabled' : ''">
             <a th:href="@{/admin/orientacion/formulario/revisar}">
                 <h3>Revisión de Orientación</h3>
                 <p>Dar la aprobación final a los formularios socioeconómicos.</p>
                 <span class="card-role-tag">Orientación</span>
             </a>
         </div>
-
         <div class="dashboard-card"
-             th:classappend="${!#authorization.expression('hasRole(''ROLE_SECRETARIA'')')} ? 'disabled' : ''">
+             th:classappend="${!#authorization.expression('hasRole(''ROLE_SECRETARIA'') or hasRole(''ROLE_SUPER_ADMIN'')')} ? 'disabled' : ''">
             <a th:href="@{/admin/secretaria/papeleria}">
                 <h3>Gestionar Papelería</h3>
                 <p>Revisar los documentos subidos por los participantes.</p>
                 <span class="card-role-tag">Secretaría</span>
             </a>
         </div>
-
         <div class="dashboard-card"
-             th:classappend="${!#authorization.expression('hasRole(''ROLE_SECRETARIA'')')} ? 'disabled' : ''">
+             th:classappend="${!#authorization.expression('hasRole(''ROLE_SECRETARIA'') or hasRole(''ROLE_SUPER_ADMIN'')')} ? 'disabled' : ''">
             <a th:href="@{/admin/secretaria/contratos}">
                 <h3>Aprobar Contratos</h3>
                 <p>Realizar la revisión final y aprobación de los contratos.</p>
                 <span class="card-role-tag">Secretaría</span>
+            </a>
+        </div>
+
+        <div class="dashboard-card super-admin"
+             th:if="${#authorization.expression('hasRole(''ROLE_SUPER_ADMIN'')')}">
+            <a th:href="@{/admin/gestion}">
+                <h3>Gestión del Sistema</h3>
+                <p>Administrar las entidades y datos maestros de la aplicación.</p>
+                <span class="card-role-tag">Super Admin</span>
             </a>
         </div>
     </div>

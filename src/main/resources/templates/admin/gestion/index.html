@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/admin_layout}">
+<head>
+    <title>Gestión del Sistema</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <a th:href="@{/admin/dashboard}" class="back-link">&larr; Volver al Dashboard</a>
+    <header class="admin-header">
+        <h1>Gestión de Datos del Sistema</h1>
+        <p>Administración de las entidades principales de la aplicación.</p>
+    </header>
+
+    <div class="dashboard-grid">
+        <div class="dashboard-card"><a th:href="@{/admin/gestion/participantes}"><h3>Gestionar Participantes</h3><p>CRUD para la entidad AdmParticipante.</p></a></div>
+        <div class="dashboard-card"><a th:href="@{/admin/gestion/administradores}"><h3>Gestionar Administradores</h3><p>CRUD para la entidad Administrador.</p></a></div>
+        <div class="dashboard-card"><a th:href="@{/admin/gestion/ciclos}"><h3>Gestionar Ciclos Académicos</h3><p>CRUD para la entidad AdmCicloAcademico.</p></a></div>
+        <div class="dashboard-card"><a th:href="@{/admin/gestion/estudios}"><h3>Gestionar Estudios Socioeconómicos</h3><p>CRUD para la entidad AdmEstudioSocioeconomico.</p></a></div>
+        <div class="dashboard-card"><a th:href="@{/admin/gestion/documentos}"><h3>Gestionar Documentos</h3><p>CRUD para la entidad AdmDocumentoRequerido.</p></a></div>
+        <div class="dashboard-card"><a th:href="@{/admin/gestion/contratos}"><h3>Gestionar Contratos</h3><p>CRUD para la entidad AdmContrato.</p></a></div>
+        <div class="dashboard-card"><a th:href="@{/admin/gestion/pagos}"><h3>Gestionar Reportes de Pago</h3><p>CRUD para la entidad AdmReportePago.</p></a></div>
+    </div>
+</main>
+</body>
+</html>

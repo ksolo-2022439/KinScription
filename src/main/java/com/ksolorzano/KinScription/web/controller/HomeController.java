@@ -23,7 +23,8 @@ public class HomeController {
         if (request.isUserInRole("ROLE_ADMIN_INSCRIPCION") ||
                 request.isUserInRole("ROLE_DIRECTOR_ADMIN") ||
                 request.isUserInRole("ROLE_ORIENTACION") ||
-                request.isUserInRole("ROLE_SECRETARIA")) {
+                request.isUserInRole("ROLE_SECRETARIA") ||
+                request.isUserInRole("ROLE_SUPER_ADMIN")) {
             return "redirect:/admin/dashboard"; // dashboard general para administradores
         }
 

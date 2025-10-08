@@ -82,6 +82,13 @@ public class DataSeeder implements CommandLineRunner {
             admin4.setRol(RolAdministrador.SECRETARIA);
             administradorRepository.save(admin4);
 
+            Administrador superadmin = new Administrador();
+            superadmin.setNombreCompleto("Secretaria");
+            superadmin.setEmail("superadmin@kinal.edu.gt");
+            superadmin.setPassword("password123"); // Contraseña en texto plano
+            superadmin.setRol(RolAdministrador.SUPER_ADMIN);
+            administradorRepository.save(superadmin);
+
             // 3. Crear un Participante de prueba
             AdmParticipante participante = new AdmParticipante();
             participante.setUsername("aspirante01");

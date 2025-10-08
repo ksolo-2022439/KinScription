@@ -253,3 +253,11 @@ main.admin-container {
     border: none;
     display: none;
 }
+
+.dashboard-card.super-admin {
+    border-top-color: #6f42c1;
+}
+.dashboard-card.super-admin .card-role-tag {
+    background-color: #e9d8fd;
+    color: #6f42c1;
+}

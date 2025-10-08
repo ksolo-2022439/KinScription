@@ -58,9 +58,10 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/css/**", "/style/**", "/js/**", "/contracts/**").permitAll()
-                        .requestMatchers("/login", "/gestion/login").permitAll() // Permitir acceso a ambas páginas de login
+                        .requestMatchers("/login", "/gestion/login").permitAll()
+                        .requestMatchers("/admin/gestion/**").hasRole("SUPER_ADMIN")
                         .requestMatchers("/portal/**").hasRole("PARTICIPANTE")
-                        .requestMatchers("/admin/**").hasAnyRole("ADMIN_INSCRIPCION", "DIRECTOR_ADMIN", "ORIENTACION", "SECRETARIA")
+                        .requestMatchers("/admin/**").hasAnyRole("ADMIN_INSCRIPCION", "DIRECTOR_ADMIN", "ORIENTACION", "SECRETARIA", "SUPER_ADMIN")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
