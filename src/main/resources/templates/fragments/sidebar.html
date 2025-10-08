@@ -4,63 +4,63 @@
 
 <aside class="sidebar" th:fragment="sidebar">
     <div class="sidebar-header">
-        <a th:href="@{/dashboard}" class="logo">KinScription</a>
+        <a th:href="@{/gestion/dashboard}" class="logo">KinScription</a>
     </div>
     <nav class="sidebar-nav">
         <div class="nav-section">
             <div class="nav-section-title">Gestión de KinScription</div>
-            <a th:href="@{/dashboard}" class="nav-item" th:classappend="${paginaActiva == 'dashboard' ? 'active' : ''}">
+            <a th:href="@{/gestion/dashboard}" class="nav-item" th:classappend="${paginaActiva == 'dashboard' ? 'active' : ''}">
                 <span class="nav-icon">📊</span>
                 <span>Dashboard</span>
             </a>
-            <a th:href="@{/profesores}" class="nav-item" th:classappend="${paginaActiva == 'profesores' ? 'active' : ''}">
+            <a th:href="@{/gestion/profesores}" class="nav-item" th:classappend="${paginaActiva == 'profesores' ? 'active' : ''}">
                 <span class="nav-icon">👨‍🏫</span>
                 <span>Profesores</span>
             </a>
-            <a th:href="@{/alumnos}" class="nav-item" th:classappend="${paginaActiva == 'alumnos' ? 'active' : ''}">
+            <a th:href="@{/gestion/alumnos}" class="nav-item" th:classappend="${paginaActiva == 'alumnos' ? 'active' : ''}">
                 <span class="nav-icon">👨‍🎓</span>
                 <span>Alumnos</span>
             </a>
-            <a th:href="@{/cursos}" class="nav-item" th:classappend="${paginaActiva == 'cursos' ? 'active' : ''}">
+            <a th:href="@{/gestion/cursos}" class="nav-item" th:classappend="${paginaActiva == 'cursos' ? 'active' : ''}">
                 <span class="nav-icon">📚</span>
                 <span>Cursos</span>
             </a>
-            <a th:href="@{/coordinadores}" class="nav-item" th:classappend="${paginaActiva == 'coordinadores' ? 'active' : ''}">
+            <a th:href="@{/gestion/coordinadores}" class="nav-item" th:classappend="${paginaActiva == 'coordinadores' ? 'active' : ''}">
                 <span class="nav-icon">👩‍💼</span>
                 <span>Coordinadores</span>
             </a>
-            <a th:href="@{/notas}" class="nav-item" th:classappend="${paginaActiva == 'notas' ? 'active' : ''}">
+            <a th:href="@{/gestion/notas}" class="nav-item" th:classappend="${paginaActiva == 'notas' ? 'active' : ''}">
                 <span class="nav-icon">📝</span>
                 <span>Notas</span>
             </a>
         </div>
         <div class="nav-section">
             <div class="nav-section-title">Datos Generales</div>
-            <a th:href="@{/tutores}" class="nav-item" th:classappend="${paginaActiva == 'tutores' ? 'active' : ''}">
+            <a th:href="@{/gestion/tutores}" class="nav-item" th:classappend="${paginaActiva == 'tutores' ? 'active' : ''}">
                 <span class="nav-icon">🏠</span>
                 <span>Tutores</span>
             </a>
-            <a th:href="@{/grados}" class="nav-item" th:classappend="${paginaActiva == 'grados' ? 'active' : ''}">
+            <a th:href="@{/gestion/grados}" class="nav-item" th:classappend="${paginaActiva == 'grados' ? 'active' : ''}">
                 <span class="nav-icon">🏆</span>
                 <span>Grados</span>
             </a>
-            <a th:href="@{/secciones}" class="nav-item" th:classappend="${paginaActiva == 'secciones' ? 'active' : ''}">
+            <a th:href="@{/gestion/secciones}" class="nav-item" th:classappend="${paginaActiva == 'secciones' ? 'active' : ''}">
                 <span class="nav-icon">📊</span>
                 <span>Secciones</span>
             </a>
-            <a th:href="@{/jornadas}" class="nav-item" th:classappend="${paginaActiva == 'jornadas' ? 'active' : ''}">
+            <a th:href="@{/gestion/jornadas}" class="nav-item" th:classappend="${paginaActiva == 'jornadas' ? 'active' : ''}">
                 <span class="nav-icon">☀️</span>
                 <span>Jornadas</span>
             </a>
-            <a th:href="@{/carreras}" class="nav-item" th:classappend="${paginaActiva == 'carreras' ? 'active' : ''}">
+            <a th:href="@{/gestion/carreras}" class="nav-item" th:classappend="${paginaActiva == 'carreras' ? 'active' : ''}">
                 <span class="nav-icon">💼</span>
                 <span>Carreras</span>
             </a>
-            <a th:href="@{/gradocurso}" class="nav-item" th:classappend="${paginaActiva == 'gradocurso' ? 'active' : ''}">
+            <a th:href="@{/gestion/gradocurso}" class="nav-item" th:classappend="${paginaActiva == 'gradocurso' ? 'active' : ''}">
                 <span class="nav-icon">🤵</span>
                 <span>Grados por Curso</span>
             </a>
-            <a th:href="@{/profesorasignacion}" class="nav-item" th:classappend="${paginaActiva == 'profesorasignacion' ? 'active' : ''}">
+            <a th:href="@{/gestion/profesorasignacion}" class="nav-item" th:classappend="${paginaActiva == 'profesorasignacion' ? 'active' : ''}">
                 <span class="nav-icon">🔨</span>
                 <span>Asignar Profesores</span>
             </a>

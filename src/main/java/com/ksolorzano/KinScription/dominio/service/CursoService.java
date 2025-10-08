@@ -46,4 +46,8 @@ public class CursoService {
             return true;
         }).orElse(false);
     }
+
+    public long countTotal() {
+        return cursoRepository.count();
+    }
 }

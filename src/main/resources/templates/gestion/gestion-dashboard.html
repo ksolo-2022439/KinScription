@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title>Dashboard Principal</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/style/cruds.css(v=1.2)}">
+    <link rel="stylesheet" type="text/css" th:href="@{/style/dashboard_gestion.css(v=1.1)}">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        .ai-panel {
+            grid-column: 1 / -1;
+            margin-top: 2rem;
+        }
+
+        .ai-response-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            align-items: start;
+        }
+
+        .ai-response-section {
+            background-color: var(--primary-bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.2rem;
+            min-width: 0;
+        }
+
+        .ai-response-section.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .ai-response-section h5 {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-top: 0;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .ai-response-section p,
+        .ai-response-section ul,
+        .ai-response-section ol {
+            font-size: 0.9rem;
+            margin: 0;
+            padding-left: 1.2rem;
+            color: var(--text-secondary-color);
+            line-height: 1.6;
+        }
+
+        .ai-response-section p {
+            padding-left: 0;
+        }
+    </style>
+</head>
+<body>
+<div class="layout-container">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <main class="main-content">
+        <div class="header-bar">
+            <h1>Dashboard Principal</h1>
+        </div>
+
+        <div class="dashboard-grid">
+            <a th:href="@{/gestion/alumnos}" class="quick-access-card">
+                <div class="card-header"><span class="nav-icon">👨‍🎓</span><span>Alumnos</span></div>
+                <div class="card-body" th:text="${totalAlumnos}">0</div>
+            </a>
+            <a th:href="@{/gestion/profesores}" class="quick-access-card">
+                <div class="card-header"><span class="nav-icon">👨‍🏫</span><span>Profesores</span></div>
+                <div class="card-body" th:text="${totalProfesores}">0</div>
+            </a>
+            <a th:href="@{/gestion/notas}" class="quick-access-card">
+                <div class="card-header"><span class="nav-icon">📝</span><span>Registros de Notas</span></div>
+                <div class="card-body" th:text="${totalNotas}">0</div>
+            </a>
+            <a th:href="@{/gestion/gradocurso}" class="quick-access-card">
+                <div class="card-header"><span class="nav-icon">🤵📚</span><span>Cursos por Grado</span></div>
+                <div class="card-body" th:text="${totalAsignaciones}">0</div>
+            </a>
+            <a th:href="@{/gestion/profesorasignacion}" class="quick-access-card">
+                <div class="card-header"><span class="nav-icon">🤵</span><span>Asignar Profesores</span></div>
+                <div class="card-body" th:text="${totalProfAsignaciones}">0</div>
+            </a>
+        </div>
+
+        <div class="ai-panel">
+            <h2>Asistente de Actividades IA</h2>
+            <form id="ai-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="ai-nivel">Nivel Educativo (Grado)</label>
+                        <select id="ai-nivel" class="form-control" required>
+                            <option value="">Seleccione un nivel...</option>
+                            <option th:each="grado : ${listaGrados}" th:value="${grado.idGrado}"
+                                    th:text="${grado.nombreGrado}"></option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="ai-materia">Materia / Curso</label>
+                        <select id="ai-materia" class="form-control" required disabled>
+                            <option value="">Primero seleccione un nivel...</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="ai-tema">Tema Específico</label>
+                    <textarea id="ai-tema" class="form-control"
+                              placeholder="Ej: La Revolución Francesa, Ecuaciones de segundo grado" required></textarea>
+                </div>
+                <button type="submit" id="ai-submit-btn" class="submit-button">Generar Sugerencia</button>
+            </form>
+
+            <div id="ai-response" class="ai-response-box">
+                <span>La sugerencia de la IA aparecerá aquí...</span>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    document.addEventListener('DOMContentLoaded', function () {
+        const nivelSelect = document.getElementById('ai-nivel');
+        const materiaSelect = document.getElementById('ai-materia');
+        const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        const header = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+        nivelSelect.addEventListener('change', async function () {
+            const idGrado = this.value;
+            materiaSelect.disabled = true;
+            materiaSelect.innerHTML = '<option value="">Cargando cursos...</option>';
+
+            if (!idGrado) {
+                materiaSelect.innerHTML = '<option value="">Primero seleccione un nivel...</option>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/gradocursos/grado/${idGrado}/cursos`);
+                if (!response.ok) throw new Error('Error al cargar cursos');
+                const cursos = await response.json();
+                materiaSelect.innerHTML = '<option value="">Seleccione un curso...</option>';
+                cursos.forEach(curso => {
+                    const option = document.createElement('option');
+                    option.value = curso.nombreCurso;
+                    option.textContent = curso.nombreCurso;
+                    materiaSelect.appendChild(option);
+                });
+                materiaSelect.disabled = false;
+            } catch (error) {
+                console.error(error);
+                materiaSelect.innerHTML = '<option value="">Error al cargar</option>';
+            }
+        });
+
+        const aiForm = document.getElementById('ai-form');
+        const submitBtn = document.getElementById('ai-submit-btn');
+        const responseDiv = document.getElementById('ai-response');
+
+        function buildAiResponseLayout(text) {
+            responseDiv.innerHTML = '';
+            responseDiv.classList.add('ai-response-grid');
+
+            const sections = text.split('### ').filter(s => s.trim() !== '');
+
+            sections.forEach(section => {
+                const parts = section.split(/:\s*\n/);
+                const title = parts[0] ? parts[0].trim() : 'Sección';
+                let content = parts[1] ? parts[1].trim() : '';
+                const htmlContent = marked.parse(content);
+
+                const sectionDiv = document.createElement('div');
+                sectionDiv.className = 'ai-response-section';
+
+                // Lógica para asignar clases de layout
+                if (title.startsWith('Nombre') || title.startsWith('Instrucciones') || title.startsWith('Adaptación')) {
+                    sectionDiv.classList.add('full-width');
+                }
+
+                sectionDiv.innerHTML = `<h5>${title}</h5>${htmlContent}`;
+                responseDiv.appendChild(sectionDiv);
+            });
+        }
+
+        aiForm.addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            const nivel = nivelSelect.options[nivelSelect.selectedIndex].text;
+            const materia = materiaSelect.value;
+            const tema = document.getElementById('ai-tema').value;
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Pensando...';
+            responseDiv.innerHTML = '<span>Generando una idea increíble, por favor espera...</span>';
+            responseDiv.classList.remove('has-content', 'ai-response-grid');
+
+            const preferencias = `Materia/Tema: ${materia}\nNivel educativo: ${nivel}\nTema específico: ${tema}`;
+
+            try {
+                const response = await fetch('/api/ai/sugerir', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json', [header]: token},
+                    body: JSON.stringify({preferencias: preferencias})
+                });
+
+                if (!response.ok) throw new Error(`Error del servidor: ${response.status}`);
+
+                const aiTextResponse = await response.text();
+                buildAiResponseLayout(aiTextResponse);
+                responseDiv.classList.add('has-content');
+
+            } catch (error) {
+                console.error('Error al contactar la IA:', error);
+                responseDiv.innerHTML = '<span>Lo siento, ocurrió un error al generar la sugerencia. Por favor, inténtalo de nuevo.</span>';
+                responseDiv.classList.remove('has-content', 'ai-response-grid');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Generar Sugerencia';
+            }
+        });
+    });
+    /*]]>*/
+</script>
+</body>
+</html>

@@ -3,7 +3,9 @@ package com.ksolorzano.KinScription.dominio.service;
 import com.ksolorzano.KinScription.dominio.repository.GradoCursoRepository;
 import com.ksolorzano.KinScription.persistence.entity.GradoCurso;
 import com.ksolorzano.KinScription.persistence.entity.GradoCursoId;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,5 +44,31 @@ public class GradoCursoService {
             return true;
         }
         return false;
+    }
+
+    public long countTotal() {
+        return gradoCursoRepository.count();
+    }
+
+    /**
+     * Busca asociaciones por filtro de grado y asegura la carga de las entidades relacionadas.
+     * @param idGrado El ID del grado por el cual filtrar (opcional).
+     * @return Una lista de asociaciones GradoCurso.
+     */
+    @Transactional(readOnly = true)
+    public List<GradoCurso> buscarPorFiltro(Integer idGrado) {
+        Specification<GradoCurso> spec = (root, query, criteriaBuilder) -> {
+            if (idGrado != null) {
+                return criteriaBuilder.equal(root.get("idGrado"), idGrado);
+            }
+            return criteriaBuilder.conjunction(); // Retorna un predicado 'true' si no hay filtro
+        };
+        List<GradoCurso> resultados = gradoCursoRepository.findAll(spec);
+        // Forzar inicialización para evitar LazyInitializationException en la vista
+        resultados.forEach(gc -> {
+            Hibernate.initialize(gc.getGrado());
+            Hibernate.initialize(gc.getCurso());
+        });
+        return resultados;
     }
 }
