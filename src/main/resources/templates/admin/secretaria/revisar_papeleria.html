@@ -1,9 +1,7 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{admin/admin_layout}">
-<head>
-    <title>Revisar Papelería</title>
-</head>
+<head><title>Revisar Papelería</title></head>
 <body>
 <main layout:fragment="content">
     <a th:href="@{/admin/secretaria/papeleria}" class="back-link">&larr; Volver a la Lista</a>
@@ -12,37 +10,56 @@
         <p>Participante: <strong th:text="${participante.nombreCompleto} + ' ' + ${participante.apellidos}"></strong></p>
     </header>
 
+    <div th:if="${errorMessage}" class="flash-error" th:text="${errorMessage}"></div>
+
     <div class="document-viewer-grid">
         <div class="admin-card">
+
             <h3>Documentos Subidos</h3>
-            <ul class="document-action-list">
-                <li th:each="doc : ${documentos}">
-                    <span th:text="${doc.nombreDocumento}"></span>
-                    <button class="btn-secondary view-pdf-btn" th:data-url="@{/uploads/{filename}(filename=${doc.urlArchivo})}">
-                        Ver Documento
-                    </button>
-                </li>
-            </ul>
+            <div th:each="docRequerido : ${documentosRequeridos}" th:with="docSubido=${mapaDocumentos.get(docRequerido)}" class="document-review-item">
+                <div class="document-info">
+                    <strong th:text="${docRequerido}"></strong>
+                    <button th:if="${docSubido != null}" type="button" class="btn-secondary view-pdf-btn"
+                            th:data-url="@{/uploads/{filename}(filename=${docSubido.urlArchivo})}">Ver</button>
+                    <span th:if="${docSubido == null}" class="badge danger">Faltante</span>
+                </div>
+            </div>
+
             <hr>
-            <h3>Acciones</h3>
+
+            <form th:action="@{/admin/secretaria/papeleria/solicitar-correccion}" method="post">
+                <input type="hidden" name="participanteId" th:value="${participante.id}" />
+                <h3>Solicitar Corrección</h3>
+                <p class="nota-info">Selecciona los documentos que el participante debe volver a subir. Esto lo devolverá al paso anterior.</p>
+                <div class="form-group">
+                    <label>Documentos a solicitar:</label>
+                    <div th:each="docRequerido : ${documentosRequeridos}" class="form-group-checkbox">
+                        <input type="checkbox" name="documentosASolicitar" th:value="${docRequerido}" th:id="'check_' + ${docRequerido}">
+                        <label th:for="'check_' + ${docRequerido}" th:text="${docRequerido}"></label>
+                    </div>
+                </div>
+                <button type="submit" class="btn-warning">Solicitar Corrección</button>
+            </form>
+
+            <hr>
+
+            <h3>Acciones Finales</h3>
             <div class="action-buttons">
                 <form th:action="@{/admin/secretaria/papeleria/aprobar}" method="post">
                     <input type="hidden" name="participanteId" th:value="${participante.id}" />
                     <button type="submit" class="btn-primary">Aprobar Toda la Papelería</button>
                 </form>
+
                 <form th:action="@{/admin/secretaria/participante/rechazar}" method="post">
                     <input type="hidden" name="participanteId" th:value="${participante.id}" />
-                    <input type="hidden" name="origen" value="papeleria" />
-                    <button type="submit" class="btn-danger">Rechazar Proceso</button>
+                    <button type="submit" class="btn-danger">Rechazar Proceso de Admisión</button>
                 </form>
             </div>
-        </div>
 
+        </div>
         <div class="admin-card pdf-viewer-container">
-            <div id="pdf-placeholder" class="pdf-placeholder">
-                <p>Selecciona un documento de la lista para visualizarlo aquí.</p>
-            </div>
-            <iframe id="pdf-viewer" class="pdf-viewer" src="" title="Visor de Documentos"></iframe>
+            <div id="pdf-placeholder" class="pdf-placeholder"><p>Selecciona un documento para visualizarlo.</p></div>
+            <iframe id="pdf-viewer" class="pdf-viewer"></iframe>
         </div>
     </div>
 

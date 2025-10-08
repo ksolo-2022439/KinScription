@@ -12,7 +12,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/admin/secretaria")
@@ -23,16 +26,13 @@ public class SecretariaController {
     private final AdmContratoService contratoService;
     private final AdmDocumentoRequeridoRepository documentoRepository;
 
-    public SecretariaController(AdmParticipanteService participanteService, AdmDocumentoRequeridoService documentoService, AdmContratoService contratoService, AdmDocumentoRequeridoRepository dr) {
-        this.participanteService = participanteService;
-        this.documentoService = documentoService;
-        this.contratoService = contratoService;
+    public SecretariaController(AdmParticipanteService ps, AdmDocumentoRequeridoService ds, AdmContratoService cs, AdmDocumentoRequeridoRepository dr) {
+        this.participanteService = ps;
+        this.documentoService = ds;
+        this.contratoService = cs;
         this.documentoRepository = dr;
     }
 
-    /**
-     * Muestra los participantes listos para la revisión de papelería.
-     */
     @GetMapping("/papeleria")
     public String listarPendientesPapeleria(Model model) {
         List<AdmParticipante> participantes = participanteService.getByEstado(EstadoParticipante.PAPELERIA_ENVIADA);
@@ -40,29 +40,75 @@ public class SecretariaController {
         return "admin/secretaria/lista_papeleria";
     }
 
-    /**
-     * Muestra la página de detalle para revisar todos los documentos de un participante.
-     * @param id El ID del PARTICIPANTE.
-     */
     @GetMapping("/papeleria/revisar/{id}")
     public String revisarPapeleria(@PathVariable("id") int id, Model model) {
         AdmParticipante participante = participanteService.getById(id)
                 .orElseThrow(() -> new RuntimeException("Participante no encontrado"));
 
-        List<AdmDocumentoRequerido> documentos = documentoRepository.findByParticipante(participante);
+        model.addAttribute("documentosRequeridos", AdmDocumentoRequeridoService.DOCUMENTOS_REQUERIDOS);
+
+        Map<String, AdmDocumentoRequerido> mapaDocumentos = documentoRepository.findByParticipante(participante).stream()
+                .collect(Collectors.toMap(AdmDocumentoRequerido::getNombreDocumento, doc -> doc));
 
         model.addAttribute("participante", participante);
-        model.addAttribute("documentos", documentos);
+        model.addAttribute("mapaDocumentos", mapaDocumentos);
 
         return "admin/secretaria/revisar_papeleria";
     }
 
-    /**
-     * Procesa la aprobación de toda la papelería de un participante.
-     */
     @PostMapping("/papeleria/aprobar")
-    public String aprobarPapeleria(@RequestParam("participanteId") int participanteId) {
-        documentoService.aprobarPapeleriaCompleta(participanteId);
+    public String aprobarPapeleria(@RequestParam("participanteId") int participanteId, RedirectAttributes redirectAttributes) {
+        try {
+            documentoService.aprobarPapeleria(participanteId);
+            redirectAttributes.addFlashAttribute("successMessage", "Papelería aprobada correctamente. El participante puede continuar al siguiente paso.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Error al aprobar la papelería: " + e.getMessage());
+        }
+        return "redirect:/admin/secretaria/papeleria";
+    }
+
+    @PostMapping("/papeleria/solicitar-correccion")
+    public String solicitarCorreccion(@RequestParam("participanteId") int participanteId,
+                                      @RequestParam(value = "documentosASolicitar", required = false) List<String> documentosASolicitar,
+                                      RedirectAttributes redirectAttributes) {
+        if (documentosASolicitar == null || documentosASolicitar.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Debe seleccionar al menos un documento para solicitar corrección.");
+            return "redirect:/admin/secretaria/papeleria/revisar/" + participanteId;
+        }
+
+        try {
+            documentoService.solicitarCorrecciones(participanteId, documentosASolicitar);
+            redirectAttributes.addFlashAttribute("successMessage", "Se ha solicitado la corrección al participante.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Error: " + e.getMessage());
+        }
+        return "redirect:/admin/secretaria/papeleria";
+    }
+
+    /**
+     * Rechaza a un participante y lo devuelve a la lista de origen.
+     * @param participanteId El ID del participante a rechazar.
+     * @param origen Un parámetro opcional que indica desde qué página se hizo el rechazo (ej. "papeleria", "contratos").
+     * @param redirectAttributes Para enviar mensajes de feedback.
+     * @return Una redirección a la lista correspondiente.
+     */
+    @PostMapping("/participante/rechazar")
+    public String rechazarParticipante(@RequestParam("participanteId") int participanteId,
+                                       @RequestParam(value = "origen", required = false) String origen,
+                                       RedirectAttributes redirectAttributes) {
+
+        AdmParticipante participante = participanteService.getById(participanteId)
+                .orElseThrow(() -> new RuntimeException("Participante no encontrado"));
+
+        participante.setEstado(EstadoParticipante.DESAPROBADO);
+        participanteService.save(participante);
+
+        redirectAttributes.addFlashAttribute("successMessage", "El participante ha sido rechazado correctamente.");
+
+        if ("contratos".equals(origen)) {
+            return "redirect:/admin/secretaria/contratos";
+        }
+
         return "redirect:/admin/secretaria/papeleria";
     }
 
@@ -96,23 +142,6 @@ public class SecretariaController {
             redirectAttributes.addFlashAttribute("successMessage", "¡Contrato aprobado! El participante ha sido inscrito y convertido en alumno exitosamente.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Error al aprobar el contrato: " + e.getMessage());
-        }
-        return "redirect:/admin/secretaria/contratos";
-    }
-
-
-
-    @PostMapping("/participante/rechazar")
-    public String rechazarParticipante(@RequestParam("participanteId") int participanteId, @RequestParam("origen") String origen) {
-        AdmParticipante participante = participanteService.getById(participanteId)
-                .orElseThrow(() -> new RuntimeException("Participante no encontrado"));
-
-        participante.setEstado(EstadoParticipante.DESAPROBADO);
-        participanteService.save(participante);
-
-        // Redirige a la página desde donde se hizo el rechazo (papelería o contratos)
-        if ("papeleria".equals(origen)) {
-            return "redirect:/admin/secretaria/papeleria";
         }
         return "redirect:/admin/secretaria/contratos";
     }

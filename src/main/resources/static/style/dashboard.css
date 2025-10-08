@@ -14,6 +14,7 @@
 *, *::before, *::after {
     box-sizing: border-box;
 }
+
 body {
     margin: 0;
     font-family: 'Poppins', sans-serif;
@@ -46,6 +47,7 @@ body {
     font-weight: 700;
     text-align: center;
 }
+
 .logo a {
     color: var(--white-color);
     text-decoration: none;
@@ -54,14 +56,17 @@ body {
 .profile-card {
     text-align: center;
 }
+
 .profile-card svg {
     margin-bottom: 0.5rem;
     stroke: var(--light-blue);
 }
+
 .profile-card h3 {
     margin: 0.5rem 0 0.2rem 0;
     font-size: 1.1rem;
 }
+
 .profile-card .profile-meta {
     font-size: 0.9rem;
     color: rgba(255, 255, 255, 0.7);
@@ -73,6 +78,7 @@ body {
     padding: 1rem;
     text-align: center;
 }
+
 .status-title {
     font-size: 0.8rem;
     margin: 0 0 0.5rem 0;
@@ -98,6 +104,7 @@ body {
 .logout-section {
     margin-top: auto;
 }
+
 .btn-logout {
     display: flex;
     align-items: center;
@@ -112,6 +119,7 @@ body {
     cursor: pointer;
     transition: background-color 0.2s;
 }
+
 .btn-logout:hover {
     background: rgba(255, 255, 255, 0.2);
 }
@@ -120,11 +128,13 @@ body {
 .main-header {
     margin-bottom: 2.5rem;
 }
+
 .main-header h1 {
     font-size: 2rem;
     color: var(--dark-blue);
     margin: 0;
 }
+
 .main-header p {
     font-size: 1.1rem;
     color: var(--text-muted);
@@ -163,6 +173,7 @@ body {
     z-index: 2;
     flex: 1;
 }
+
 .step .circle {
     width: 30px;
     height: 30px;
@@ -178,6 +189,7 @@ body {
     transition: all 0.3s ease;
     position: relative;
 }
+
 .step p {
     font-size: 0.9rem;
     font-weight: 500;
@@ -190,6 +202,7 @@ body {
     background-color: var(--primary-blue);
     color: var(--white-color);
 }
+
 .step.active p {
     color: var(--text-color);
 }
@@ -199,6 +212,7 @@ body {
     background-color: var(--primary-blue);
     color: var(--white-color);
 }
+
 .step.completed p {
     color: var(--text-color);
 }
@@ -223,20 +237,31 @@ body {
     box-shadow: 0 5px 25px rgba(0, 40, 100, 0.08);
     border-left: 5px solid;
 }
+
 .card h3 {
     margin: 0 0 0.5rem 0;
     font-size: 1.4rem;
     color: var(--dark-blue);
 }
+
 .card p {
     color: var(--text-muted);
     line-height: 1.6;
     margin-bottom: 1.5rem;
 }
 
-.card.active { border-color: var(--primary-blue); }
-.card.waiting { border-color: var(--warning-color); }
-.card.completed { border-color: var(--success-color); }
+.card.active {
+    border-color: var(--primary-blue);
+}
+
+.card.waiting {
+    border-color: var(--warning-color);
+}
+
+.card.completed {
+    border-color: var(--success-color);
+}
+
 .card .btn-primary, .card .credentials-box {
     margin-top: 1rem;
 }
@@ -267,7 +292,10 @@ body {
     border-radius: 8px;
     margin-bottom: 1rem;
 }
-.credentials-box p { margin: 0.5rem 0; }
+
+.credentials-box p {
+    margin: 0.5rem 0;
+}
 
 .flash-success {
     background-color: #e6f9f1;
@@ -351,24 +379,54 @@ body {
     list-style: none;
     padding: 0;
 }
+
 .document-list li {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.8rem 0;
+    padding: 1rem 0;
     border-bottom: 1px solid var(--border-color);
 }
 .document-list li:last-child {
     border-bottom: none;
 }
+
+.document-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.document-item-name {
+    font-weight: 500;
+}
+
+.document-item-status {
+}
+
+.document-item-comment {
+    margin-top: 0.5rem;
+    padding-left: 0;
+    width: 100%;
+}
+.document-item-comment .error-message {
+    display: block;
+}
+
 .badge {
     font-size: 0.75rem;
     font-weight: 700;
     padding: 0.25rem 0.6rem;
     border-radius: 12px;
 }
-.badge.success { background-color: var(--admin-success-bg); color: var(--admin-success); }
-.badge.pending { background-color: #fff8e1; color: #f0932b; }
+
+.badge.success {
+    background-color: var(--admin-success-bg);
+    color: var(--admin-success);
+}
+
+.badge.pending {
+    background-color: #fff8e1;
+    color: #f0932b;
+}
 
 .btn-download {
     display: inline-flex;
@@ -383,14 +441,38 @@ body {
     border-radius: 8px;
     transition: background-color 0.2s;
 }
+
 .btn-download:hover {
     background-color: #00a082;
+}
+
+.badge.danger {
+    background-color: #f2dede;
+    color: #a94442;
+}
+
+.document-item-info {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.document-list small.error-message {
+    margin-top: -0.5rem;
+    display: block;
+    width: 100%;
+}
+
+.error-message {
+    color: #e74c3c;
+    font-size: 0.85rem;
 }
 
 @media (max-width: 1024px) {
     .page-container {
         flex-direction: column;
     }
+
     .sidebar {
         width: 100%;
         height: auto;
@@ -399,7 +481,16 @@ body {
         align-items: center;
         padding: 1rem;
     }
-    .profile-card, .status-card { display: none; }
-    .logout-section { margin-top: 0; }
-    .content-wrapper { padding: 1.5rem; }
+
+    .profile-card, .status-card {
+        display: none;
+    }
+
+    .logout-section {
+        margin-top: 0;
+    }
+
+    .content-wrapper {
+        padding: 1.5rem;
+    }
 }

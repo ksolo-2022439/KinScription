@@ -15,47 +15,72 @@
 
     <div class="review-grid">
         <div class="admin-card">
-            <h3>Documentos Requeridos</h3>
+            <h3>Estado de Documentos</h3>
+            <div th:if="${!documentosObligatorios.isEmpty()}" class="flash-error" style="margin-bottom: 1rem;">
+                <p><strong>¡Atención!</strong> Secretaría ha solicitado que subas o corrijas los documentos marcados
+                    como "Obligatorio".</p>
+            </div>
+
             <ul class="document-list">
-                <li th:each="doc : ${documentosRequeridos}">
-                    <span th:text="${doc}"></span>
-                    <span th:if="${documentosSubidos.containsKey(doc)}" class="badge success">Subido</span>
-                    <span th:unless="${documentosSubidos.containsKey(doc)}" class="badge pending">Pendiente</span>
-                </li>
+                <th:block th:each="docNombre : ${documentosRequeridos}">
+                    <li th:with="docSubido=${documentosSubidos.get(docNombre)}">
+
+                        <div class="document-item">
+
+                            <div class="document-item-name">
+                                <span th:text="${docNombre}"></span>
+                            </div>
+
+                            <div class="document-item-status">
+                                <span th:if="${documentosObligatorios.contains(docNombre) and (docSubido == null or docSubido.estadoRevision == 'RECHAZADO')}" class="badge danger">Obligatorio</span>
+                                <span th:if="${!documentosObligatorios.contains(docNombre) and docSubido == null}" class="badge pending">Opcional</span>
+                                <span th:if="${docSubido != null and docSubido.estadoRevision == 'PENDIENTE'}" class="badge pending">En Revisión</span>
+                                <span th:if="${docSubido != null and docSubido.estadoRevision == 'APROBADO'}" class="badge success">Aprobado</span>
+                            </div>
+
+                        </div>
+
+                        <div th:if="${docSubido != null and docSubido.estadoRevision == 'RECHAZADO'}" class="document-item-comment">
+                            <small th:text="${docSubido.comentarioRechazo}" class="error-message"></small>
+                        </div>
+
+                    </li>
+                </th:block>
             </ul>
         </div>
-
         <div class="admin-card">
-            <h3>Subir un Documento</h3>
+            <h3>Subir/Corregir Documento</h3>
             <form th:action="@{/portal/papeleria/subir}" method="post" enctype="multipart/form-data">
                 <div class="form-group">
-                    <label for="documentoNombre">1. Selecciona el tipo de documento:</label>
-                    <select id="documentoNombre" name="documentoNombre" class="form-control" required>
+                    <label>1. Selecciona el tipo de documento:</label>
+                    <select name="documentoNombre" class="form-control" required>
                         <option value="">-- Elige un documento --</option>
-                        <th:block th:each="doc : ${documentosRequeridos}">
-                            <option th:if="${!documentosSubidos.containsKey(doc)}" th:value="${doc}" th:text="${doc}"></option>
-                        </th:block>
+                        <option th:each="doc : ${documentosRequeridos}" th:value="${doc}" th:text="${doc}"></option>
                     </select>
+                    <small>Si subes un documento ya existente, será reemplazado.</small>
                 </div>
-
                 <div class="form-group">
                     <label for="file">2. Elige el archivo (PDF, JPG, PNG):</label>
                     <input type="file" id="file" name="file" class="form-control" required>
                 </div>
-
                 <button type="submit" class="btn-primary">Subir Documento</button>
             </form>
 
             <hr>
 
             <h3>Finalizar Proceso</h3>
-            <p class="nota-info">
-                Una vez hayas subido TODOS los documentos requeridos, presiona este botón para enviar tu papelería a revisión.
-            </p>
-            <form th:if="${documentosSubidos.size() == documentosRequeridos.size()}"
+            <form th:if="${participante.estado.name() == 'ADMITIDO_FORMULARIO'}"
                   th:action="@{/portal/papeleria/finalizar}" method="post" style="margin-top: 1rem;">
-                <button type="submit" class="btn-primary">Finalizar y Enviar a Revisión</button>
+                <button type="submit" class="btn-primary" th:disabled="${!todosObligatoriosSubidos}">Finalizar y Enviar
+                    a Revisión
+                </button>
+                <p th:if="${!todosObligatoriosSubidos}" class="nota-info" style="margin-top: 1rem;">
+                    Debes subir todos los documentos marcados como "Obligatorio" para poder finalizar.
+                </p>
             </form>
+            <div th:if="${participante.estado.name() == 'PAPELERIA_ENVIADA'}">
+                <p><em>Ya has enviado tu papelería. Ahora está pendiente de revisión por parte de Secretaría.</em></p>
+            </div>
         </div>
     </div>
 </main>

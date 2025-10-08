@@ -9,76 +9,109 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class AdmDocumentoRequeridoService {
 
-    private final AdmDocumentoRequeridoRepository documentoRequeridoRepository;
+    public static final List<String> DOCUMENTOS_REQUERIDOS = List.of(
+            "Fe de Edad", "Acta de Nacimiento", "Certificado 3ro Básico"
+    );
+
+    private final AdmDocumentoRequeridoRepository documentoRepository;
     private final AdmParticipanteService participanteService;
 
     @Autowired
-    public AdmDocumentoRequeridoService(AdmDocumentoRequeridoRepository documentoRequeridoRepository, AdmParticipanteService participanteService) {
-        this.documentoRequeridoRepository = documentoRequeridoRepository;
-        this.participanteService = participanteService;
+    public AdmDocumentoRequeridoService(AdmDocumentoRequeridoRepository dr, AdmParticipanteService ps) {
+        this.documentoRepository = dr;
+        this.participanteService = ps;
     }
 
-    /**
-     * Guarda un documento subido por un participante.
-     * @param documento El objeto del documento.
-     * @return El documento guardado.
-     */
-    public AdmDocumentoRequerido save(AdmDocumentoRequerido documento) {
-        return documentoRequeridoRepository.save(documento);
-    }
-
-    /**
-     * Lógica para que Secretaría apruebe toda la papelería de un participante.
-     * Este método asume que se aprueban todos los documentos en conjunto.
-     * @param participanteId El ID del participante cuya papelería se aprueba.
-     */
     @Transactional
-    public void aprobarPapeleriaCompleta(int participanteId) {
+    public void solicitarCorrecciones(int participanteId, List<String> documentosASolicitar) {
         AdmParticipante participante = participanteService.getById(participanteId)
                 .orElseThrow(() -> new RuntimeException("Participante no encontrado"));
 
         if (participante.getEstado() != EstadoParticipante.PAPELERIA_ENVIADA) {
-            throw new IllegalStateException("El participante no ha completado el paso de formulario socioeconómico.");
+            throw new IllegalStateException("El participante no está en el estado correcto para esta acción.");
         }
 
-        // Aquí podría ir una lógica para verificar que todos los documentos requeridos esten, pero la voy a omitir
+        List<AdmDocumentoRequerido> documentosSubidos = documentoRepository.findByParticipante(participante);
+        documentosSubidos.forEach(doc -> {
+            doc.setEstadoRevision("APROBADO");
+            doc.setComentarioRechazo(null);
+            documentoRepository.save(doc);
+        });
+
+        for (String docNombre : documentosASolicitar) {
+            Optional<AdmDocumentoRequerido> docOpt = documentoRepository.findByParticipanteAndNombreDocumento(participante, docNombre);
+
+            AdmDocumentoRequerido docParaRechazar;
+            if (docOpt.isPresent()) {
+                docParaRechazar = docOpt.get();
+            } else {
+                docParaRechazar = new AdmDocumentoRequerido();
+                docParaRechazar.setParticipante(participante);
+                docParaRechazar.setNombreDocumento(docNombre);
+                docParaRechazar.setUrlArchivo("PENDIENTE_DE_SUBIR");
+            }
+
+            docParaRechazar.setEstadoRevision("RECHAZADO");
+            //docParaRechazar.setComentarioRechazo("Secretaría ha solicitado este documento.");
+            documentoRepository.save(docParaRechazar);
+        }
+
+        participante.setEstado(EstadoParticipante.ADMITIDO_FORMULARIO);
+        participanteService.save(participante);
+    }
+
+    @Transactional
+    public void aprobarPapeleria(int participanteId) {
+        AdmParticipante participante = participanteService.getById(participanteId)
+                .orElseThrow(() -> new RuntimeException("Participante no encontrado"));
+
+        if (participante.getEstado() != EstadoParticipante.PAPELERIA_ENVIADA) {
+            throw new IllegalStateException("El participante no está en el estado correcto para esta acción.");
+        }
+
+        List<AdmDocumentoRequerido> documentosSubidos = documentoRepository.findByParticipante(participante);
+        Map<String, AdmDocumentoRequerido> mapaSubidos = documentosSubidos.stream()
+                .collect(Collectors.toMap(AdmDocumentoRequerido::getNombreDocumento, doc -> doc));
+
+        for(String docRequerido : DOCUMENTOS_REQUERIDOS){
+            if(!mapaSubidos.containsKey(docRequerido)){
+                throw new IllegalStateException("No se puede aprobar: falta el documento '" + docRequerido + "'.");
+            }
+        }
+
+        documentosSubidos.forEach(doc -> {
+            doc.setEstadoRevision("APROBADO");
+            doc.setComentarioRechazo(null);
+            documentoRepository.save(doc);
+        });
 
         participante.setEstado(EstadoParticipante.ADMITIDO_PAPELERIA);
         participanteService.save(participante);
     }
 
+    public AdmDocumentoRequerido save(AdmDocumentoRequerido documento) {
+        return documentoRepository.save(documento);
+    }
+
     public Optional<AdmDocumentoRequerido> getById(Integer id) {
-        return documentoRequeridoRepository.findById(id);
+        return documentoRepository.findById(id);
     }
 
-    @Transactional
-    public Optional<AdmDocumentoRequerido> update(Integer id, AdmDocumentoRequerido newData) {
-        return documentoRequeridoRepository.findById(id).map(doc -> {
-            doc.setNombreDocumento(newData.getNombreDocumento());
-            doc.setUrlArchivo(newData.getUrlArchivo());
-            doc.setEstadoRevision(newData.getEstadoRevision());
-            return documentoRequeridoRepository.save(doc);
-        });
+    public List<AdmDocumentoRequerido> getAll() {
+        return documentoRepository.findAll();
     }
 
-    @Transactional
     public boolean delete(Integer id) {
         return getById(id).map(doc -> {
-            documentoRequeridoRepository.deleteById(id);
+            documentoRepository.deleteById(id);
             return true;
         }).orElse(false);
-    }
-
-    /**
-     * Obtiene una lista de todos los documentos requeridos subidos en el sistema.
-     * @return Una lista de todas las entidades AdmDocumentoRequerido.
-     */
-    public List<AdmDocumentoRequerido> getAll() {
-        return documentoRequeridoRepository.findAll();
     }
 }

@@ -2,10 +2,7 @@ package com.ksolorzano.KinScription.web.controller;
 
 import com.ksolorzano.KinScription.dominio.repository.AdmDocumentoRequeridoRepository;
 import com.ksolorzano.KinScription.dominio.repository.AlumnoRepository;
-import com.ksolorzano.KinScription.dominio.service.AdmContratoService;
-import com.ksolorzano.KinScription.dominio.service.AdmEstudioSocioeconomicoService;
-import com.ksolorzano.KinScription.dominio.service.AdmParticipanteService;
-import com.ksolorzano.KinScription.dominio.service.FileSystemStorageService;
+import com.ksolorzano.KinScription.dominio.service.*;
 import com.ksolorzano.KinScription.persistence.entity.*;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +17,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Controller
@@ -149,16 +147,24 @@ public class PortalParticipanteController {
     public String mostrarFormularioPapeleria(Model model, Authentication authentication) {
         AdmParticipante participante = participanteService.getByUsername(authentication.getName()).orElseThrow();
 
-        List<String> documentosRequeridos = List.of("Fe de Edad", "Acta de Nacimiento", "Certificado 3ro Básico");
+        List<String> documentosRequeridosDefinidos = AdmDocumentoRequeridoService.DOCUMENTOS_REQUERIDOS;
+        List<AdmDocumentoRequerido> documentosSubidosList = documentoRepository.findByParticipante(participante);
+        Map<String, AdmDocumentoRequerido> mapaSubidos = documentosSubidosList.stream()
+                .collect(Collectors.toMap(AdmDocumentoRequerido::getNombreDocumento, doc -> doc, (doc1, doc2) -> doc2));
 
-        // Documentos que el usuario ya ha subido
-        List<AdmDocumentoRequerido> documentosSubidos = documentoRepository.findByParticipante(participante);
-        Map<String, String> mapaSubidos = documentosSubidos.stream()
-                .collect(Collectors.toMap(AdmDocumentoRequerido::getNombreDocumento, AdmDocumentoRequerido::getUrlArchivo));
+        List<String> documentosObligatorios = documentosSubidosList.stream()
+                .filter(doc -> "RECHAZADO".equals(doc.getEstadoRevision()))
+                .map(AdmDocumentoRequerido::getNombreDocumento)
+                .collect(Collectors.toList());
+
+        boolean todosObligatoriosSubidos = documentosObligatorios.stream()
+                .allMatch(docNombre -> mapaSubidos.containsKey(docNombre) && "PENDIENTE".equals(mapaSubidos.get(docNombre).getEstadoRevision()));
 
         model.addAttribute("participante", participante);
-        model.addAttribute("documentosRequeridos", documentosRequeridos);
+        model.addAttribute("documentosRequeridos", documentosRequeridosDefinidos);
         model.addAttribute("documentosSubidos", mapaSubidos);
+        model.addAttribute("documentosObligatorios", documentosObligatorios);
+        model.addAttribute("todosObligatoriosSubidos", todosObligatoriosSubidos);
 
         return "portal/papeleria";
     }
@@ -170,14 +176,24 @@ public class PortalParticipanteController {
                                  RedirectAttributes redirectAttributes) {
 
         AdmParticipante participante = participanteService.getByUsername(authentication.getName()).orElseThrow();
+
+        Optional<AdmDocumentoRequerido> docExistenteOpt = documentoRepository.findByParticipanteAndNombreDocumento(participante, documentoNombre);
+
         String filename = storageService.store(file);
 
-        AdmDocumentoRequerido doc = new AdmDocumentoRequerido();
-        doc.setParticipante(participante);
-        doc.setNombreDocumento(documentoNombre);
-        doc.setUrlArchivo(filename);
-        doc.setEstadoRevision("PENDIENTE");
-        documentoRepository.save(doc);
+        AdmDocumentoRequerido docParaGuardar;
+        if (docExistenteOpt.isPresent()) {
+            docParaGuardar = docExistenteOpt.get();
+        } else {
+            docParaGuardar = new AdmDocumentoRequerido();
+            docParaGuardar.setParticipante(participante);
+            docParaGuardar.setNombreDocumento(documentoNombre);
+        }
+
+        docParaGuardar.setUrlArchivo(filename);
+        docParaGuardar.setEstadoRevision("PENDIENTE");
+        docParaGuardar.setComentarioRechazo(null);
+        documentoRepository.save(docParaGuardar);
 
         redirectAttributes.addFlashAttribute("successMessage", "Documento '" + documentoNombre + "' subido correctamente.");
         return "redirect:/portal/papeleria";

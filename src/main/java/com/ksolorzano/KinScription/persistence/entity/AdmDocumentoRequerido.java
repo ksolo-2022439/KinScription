@@ -24,4 +24,7 @@ public class AdmDocumentoRequerido {
 
     @Column(length = 20)
     private String estadoRevision; // "PENDIENTE", "APROBADO"
+
+    @Column(name = "comentario_rechazo", length = 255)
+    private String comentarioRechazo;
 }
