@@ -26,7 +26,6 @@ public class GestionUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        // 1. Buscar en Coordinadores
         return coordinadorRepository.findByEmail(email)
                 .map(coordinador -> {
                     List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_COORDINADOR"));

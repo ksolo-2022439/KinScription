@@ -21,7 +21,6 @@ public class GlobalExceptionHandler {
 
         redirectAttributes.addFlashAttribute("errorMessage", "Error: El archivo supera el tamaño máximo permitido (5MB).");
 
-        // Obtenemos la URL de la página anterior para redirigir al usuario de vuelta a ella.
         String referer = request.getHeader("Referer");
 
         return "redirect:" + (referer != null ? referer : "/");

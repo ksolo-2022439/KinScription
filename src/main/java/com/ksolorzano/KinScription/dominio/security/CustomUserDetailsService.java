@@ -31,9 +31,6 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        // --- BÚSQUEDA EXPLÍCITA ---
-
-        // Intento 1: ¿Es un administrador de inscripción?
         Optional<Administrador> adminOpt = administradorRepository.findByEmail(username);
         if (adminOpt.isPresent()) {
             Administrador admin = adminOpt.get();
@@ -49,7 +46,6 @@ public class CustomUserDetailsService implements UserDetailsService {
             );
         }
 
-        // Intento 2: ¿Es un participante?
         Optional<AdmParticipante> participanteOpt = participanteRepository.findByUsername(username);
         if (participanteOpt.isPresent()) {
             AdmParticipante participante = participanteOpt.get();
@@ -64,7 +60,6 @@ public class CustomUserDetailsService implements UserDetailsService {
             );
         }
 
-        // Si después de buscar en AMBAS tablas no se encuentra, entonces lanzamos la excepción.
         throw new UsernameNotFoundException("Usuario no encontrado en el portal de admisión: " + username);
     }
 

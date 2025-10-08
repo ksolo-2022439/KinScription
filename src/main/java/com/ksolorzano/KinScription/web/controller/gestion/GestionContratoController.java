@@ -24,8 +24,6 @@ public class GestionContratoController {
 
     @GetMapping
     public String listarContratos(Model model) {
-        // Para este CRUD, necesitamos obtener todos los contratos.
-        // El servicio no tiene un método getAll(), así que lo añadiremos.
         List<AdmContrato> contratos = contratoService.getAll();
         model.addAttribute("contratos", contratos);
 

@@ -43,7 +43,20 @@
                     <td><span class="badge pending" th:text="${#strings.replace(p.estado.name(), '_', ' ')}"></span>
                     </td>
                     <td class="action-buttons">
-                        <button class="btn-secondary" th:onclick="openModal([[${p}]])">Editar</button>
+                        <button class="btn-secondary" th:onclick="openModal({
+        id: [[${p.id}]],
+        nombreCompleto: [[${p.nombreCompleto}]],
+        apellidos: [[${p.apellidos}]],
+        direccion: [[${p.direccion}]],
+        username: [[${p.username}]],
+        fechaNacimiento: [[${p.fechaNacimiento}]],
+        estado: [[${p.estado}]],
+        gradoAplica: { idGrado: [[${p.gradoAplica?.idGrado}]] },
+        carreraAplica: { idCarrera: [[${p.carreraAplica?.idCarrera}]] },
+        cicloAcademico: { id: [[${p.cicloAcademico?.id}]] }
+    })">Editar
+                        </button>
+
                         <form th:action="@{/admin/gestion/participantes/desactivar/{id}(id=${p.id})}" method="post"
                               onsubmit="return confirm('¿Seguro que quieres desactivar a este participante?');"
                               style="display: inline;">
